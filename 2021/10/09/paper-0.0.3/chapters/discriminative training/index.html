@@ -86,7 +86,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">991</span>
+            <span class="post-count">1k</span>
         </span>
     </span>
 
@@ -119,18 +119,15 @@
 \max_{S}\mathbb{P}(S|O)</script><p>其中 <script type="math/tex">O</script> 表示观测到的语音信号，<script type="math/tex">S</script> 表示词序列。传统的语音识别进一步分解上面的公式，</p>
 <script type="math/tex; mode=display">
 \max_{S} \mathbb{P}(S|O) = \max_{S}\frac{\mathbb{P}_{\theta}(O|S)\mathbb{P}(S)}{\mathbb{P}(O)}</script><p>其中，分母 <script type="math/tex">\mathbb{P}(O)</script> 在声音信号给定之后是不需要考虑的常量；分子上 <script type="math/tex">\mathbb{P}(S)</script> 是语言模型， <script type="math/tex">\mathbb{P}_{\theta}(O|S)</script> 是声学模型。 声学模型通常是基于给定的 <script type="math/tex">N</script> 个训练数据 <script type="math/tex">\{( S_{i}, O_{i})\}_{i=1}^{N}</script> 求得 <script type="math/tex">\theta</script> 的极大似然估计。 </p>
-<p>为了能够理解极大似然估计的缺陷，先回顾一下极大似然估计。 统计的频率学派将参数 <script type="math/tex">\theta</script> 视为未知的固常量，在模型类型给定的基础上，基于训练数据寻找使得似然最大的 <script type="math/tex">\theta</script>，记为 <script type="math/tex">\hat{\theta}_{MLE}</script>， 这个值就是 <script type="math/tex">\theta</script> 的极大似然估计。求极大似然估计的过程中，首先需要给定模型类型，例如在语音识别中，通常假定模型为 GMM-HMM 或者 DNN-HMM。因为真实的语音信号并不是由 HMM 生成的，所以在 GMM-HMM 模型的基础上根据似然最大准则找到的最优参数并不一定使得 WER 或者 SER 最小。 </p>
+<p>为了能够理解极大似然估计的缺陷，先回顾一下极大似然估计。 统计的频率学派将参数 <script type="math/tex">\theta</script> 视为未知的常量，在模型类型给定的基础上，基于训练数据寻找使得似然最大的 <script type="math/tex">\theta</script>，记为 <script type="math/tex">\hat{\theta}_{MLE}</script>， 这个值就是 <script type="math/tex">\theta</script> 的极大似然估计。求极大似然估计的过程中，首先需要给定模型类型，例如在语音识别中，通常假定模型为 GMM-HMM 或者 DNN-HMM。因为真实的语音信号并不是由 HMM 生成的，所以在 GMM-HMM 模型的基础上根据似然最大准则找到的最优参数并不一定使得 WER 或者 SER 最小。 </p>
 <p>​    实际上，<script type="math/tex">\mathbb{P}_{\theta}(O|S)</script> 是描述数据分布的生成式模型 (generative model)，即给定词序列，假设观测到的语音信号服从 GMM-HMM 或者 DNN-HMM 模型描述的分布。不同于生成式模型，区分性模型 (discriminative model，也称为判别式模型) 直接对给定观测数据条件下真实类别的分布进行建模。即对 <script type="math/tex">\mathbb{P}_{\theta}(S|O)</script> 进行建模。</p>
 <h2 id="3-MMI"><a href="#3-MMI" class="headerlink" title="3. MMI"></a>3. MMI</h2><p>​    因为语音信号随机变量 <script type="math/tex">\mathbf{O}</script> 和词序列随机变量 <script type="math/tex">\mathbf{S}</script> 的互信息如下，</p>
 <script type="math/tex; mode=display">
 \begin{align}\mathbb{I}(\mathbf{O}, \mathbf{S}) &= \mathbb{E}\log\frac{\mathbb{P}(\mathbf{O},\mathbf{S})}{\mathbb{P}(\mathbf{O})\mathbb{P}(\mathbf{S})}\\
-&=\mathbb{H}(\mathbf{S})-\mathbb{H}(\mathbf{S}|\mathbf{O})\end{align}</script><p>同时 <script type="math/tex">\mathbb{H}(\mathbf{S})</script> 与待估计模型的参数无关。 所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{S})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{S}|\mathbf{O})</script>。极小化条件熵意味着在给定观测语音信号随机变量 <script type="math/tex">O</script> 后，极小化词序列随机变量 <script type="math/tex">S</script> 的不确定性。 又因为条件熵 </p>
+&=\mathbb{H}(\mathbf{S})-\mathbb{H}(\mathbf{S}|\mathbf{O})\end{align}</script><p>其中， <script type="math/tex">\mathbb{H}(\mathbf{S})</script> 表示词序列随机变量的熵，而 <script type="math/tex">\mathbb{H}(\mathbf{S}|\mathbf{O})</script> 表示条件为观测随机变量的条件熵。</p>
+<p>​    同时 <script type="math/tex">\mathbb{H}(\mathbf{S})</script> 与待估计模型的参数无关。 所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{S})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{S}|\mathbf{O})</script>。极小化条件熵意味着在给定观测语音信号随机变量 <script type="math/tex">\mathbf{O}</script> 后，极小化词序列随机变量 <script type="math/tex">\mathbf{S}</script> 的不确定性。 又因为互信息表达式， </p>
 <script type="math/tex; mode=display">
-\begin{align}
-\mathbb{H}(\mathbf{S}|\mathbf{O}) &= \sum_{O}\mathbb{P}(\mathbf{O}=O)\mathbb{H}(\mathbf{S}|\mathbf{O}=O)\\
-&=\sum_{O}\sum_{S}-\mathbb{P}(O)\mathbb{P}(S|O)\log\mathbb{P}(S|O)
-\end{align}</script><p>所以极大互信息 (MMI, maximum mutual information) 直接求使得 <script type="math/tex">\mathbb{P}_{\theta}(S|O)</script> 极大的 <script type="math/tex">\hat{\theta}_{MMI}</script>，这个估计被称为 MMI 估计。</p>
-<p>为了简化计算，考虑下面的对数似然，</p>
+\mathbb{I}(\mathbf{O}，\mathbf{S}) = \mathbb{E}\log\frac{\mathbb{P}(\mathbf{O},\mathbf{S})}{\mathbb{P}(\mathbf{O})} - \mathbb{E}\log\mathbb{P}(\mathbf{S})</script><p>其中 <script type="math/tex">\mathbb{P}(\mathbf{S})</script> 不含模型待估参数。 因此，极大化互信息等价于极大化上式右边第一项。所以极大互信息 (MMI, maximum mutual information) 直接求使得 <script type="math/tex">\mathbb{P}_{\theta}(S|O)</script> 极大的 <script type="math/tex">\hat{\theta}_{MMI}</script>，这个估计被称为 MMI 估计。具体的表达式如下，</p>
 <script type="math/tex; mode=display">
 \begin{align}
 \hat{\theta}_{MMI}  &= \arg\max_{\theta} \sum_{i=1}^{N}\log\mathbb{P}_{\theta}(S_{i}|O_{i})\\
