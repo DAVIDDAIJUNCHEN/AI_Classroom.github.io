@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>暄妍</title>
+  
+  
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2021-10-10T01:43:49.523Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>Daijun Chen</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>序列区分性训练</title>
+    <link href="http://example.com/2021/10/09/paper-0.0.3/chapters/discriminative%20training/"/>
+    <id>http://example.com/2021/10/09/paper-0.0.3/chapters/discriminative%20training/</id>
+    <published>2021-10-09T08:32:08.710Z</published>
+    <updated>2021-10-10T01:43:49.523Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 style=&quot;text-align: center&quot;&gt; 序列区分性训练 &lt;/h1&gt;
+&lt;div style=&quot;text-align: center&quot;&gt;&lt;small&gt;陈代君 - 2021&lt;/small&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2 id=&quot;1-生成式模型的缺陷&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="人工智能" scheme="http://example.com/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/"/>
+    
+    
+    <category term="语音识别" scheme="http://example.com/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/"/>
+    
+  </entry>
+  
+</feed>
