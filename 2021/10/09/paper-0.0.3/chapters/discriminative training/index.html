@@ -86,7 +86,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">901</span>
+            <span class="post-count">989</span>
         </span>
     </span>
 
@@ -123,8 +123,8 @@
 <p>​    实际上，<script type="math/tex">\mathbb{P}_{\theta}(\mathbf{O}|\mathbf{S})</script> 是描述数据分布的生成式模型 (generative model)，即给定词序列，假设观测到的语音信号服从 GMM-HMM 或者 DNN-HMM 模型描述的分布。不同于生成式模型，区分性模型 (discriminative model，也称为判别式模型) 直接对给定观测数据条件下真实类别的分布进行建模。即对 <script type="math/tex">\mathbb{P}_{\theta}(\mathbf{S}|\mathbf{O})</script> 进行建模。</p>
 <h2 id="3-MMI"><a href="#3-MMI" class="headerlink" title="3. MMI"></a>3. MMI</h2><p>​    因为观测到的语音信号 <script type="math/tex">\mathbf{O}</script> 和词序列 <script type="math/tex">\mathbf{S}</script> 的互信息如下，</p>
 <script type="math/tex; mode=display">
-\mathbb{I}(\mathbf{O}, \mathbf{S}) = \sum_{O}\sum_{S}\mathbb{P}(O,S)\log\frac{\mathbb{P}(O,S)}{\mathbb{P}(O)\cdot\mathbb{P}(S)}</script><p>极大化互信息，</p>
-<p>极大互信息(MMI, maximum mutual information) 直接求使得 <script type="math/tex">\mathbb{P}_{\theta}(\mathbf{S}|\mathbf{O})</script> 极大的 <script type="math/tex">\hat{\theta}_{MMI}</script>，这个估计称为 MMI 估计。</p>
+\begin{align}\mathbb{I}(\mathbf{O}, \mathbf{S}) &= \sum_{O}\sum_{S}\mathbb{P}(O,S)\log\frac{\mathbb{P}(O,S)}{\mathbb{P}(O)\mathbb{P}(S)}\\
+&=\mathbb{H}(\mathbf{S})-\mathbb{H}(\mathbf{S}|\mathbf{O})\end{align}</script><p>同时 <script type="math/tex">\mathbb{H}(\mathbf{S})</script> 与待估计模型的参数无关。 所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{S})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{S}|\mathbf{O})</script>。极小化条件熵意味着在给定观测语音信号 <script type="math/tex">\mathbf{O}</script> 后，极小化词序列 <script type="math/tex">\mathbf{S}</script> 的不确定性。 极大互信息 (MMI, maximum mutual information) 直接求使得 <script type="math/tex">\mathbb{P}_{\theta}(\mathbf{S}|\mathbf{O})</script> 极大的 <script type="math/tex">\hat{\theta}_{MMI}</script>，这个估计被称为 MMI 估计。</p>
 <p>为了简化计算，考虑下面的对数似然，</p>
 <script type="math/tex; mode=display">
 \begin{align}
