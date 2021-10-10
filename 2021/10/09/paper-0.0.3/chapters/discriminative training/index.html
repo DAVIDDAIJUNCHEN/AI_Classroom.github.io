@@ -86,7 +86,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">989</span>
+            <span class="post-count">1k</span>
         </span>
     </span>
 
@@ -124,7 +124,13 @@
 <h2 id="3-MMI"><a href="#3-MMI" class="headerlink" title="3. MMI"></a>3. MMI</h2><p>​    因为观测到的语音信号 <script type="math/tex">\mathbf{O}</script> 和词序列 <script type="math/tex">\mathbf{S}</script> 的互信息如下，</p>
 <script type="math/tex; mode=display">
 \begin{align}\mathbb{I}(\mathbf{O}, \mathbf{S}) &= \sum_{O}\sum_{S}\mathbb{P}(O,S)\log\frac{\mathbb{P}(O,S)}{\mathbb{P}(O)\mathbb{P}(S)}\\
-&=\mathbb{H}(\mathbf{S})-\mathbb{H}(\mathbf{S}|\mathbf{O})\end{align}</script><p>同时 <script type="math/tex">\mathbb{H}(\mathbf{S})</script> 与待估计模型的参数无关。 所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{S})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{S}|\mathbf{O})</script>。极小化条件熵意味着在给定观测语音信号 <script type="math/tex">\mathbf{O}</script> 后，极小化词序列 <script type="math/tex">\mathbf{S}</script> 的不确定性。 极大互信息 (MMI, maximum mutual information) 直接求使得 <script type="math/tex">\mathbb{P}_{\theta}(\mathbf{S}|\mathbf{O})</script> 极大的 <script type="math/tex">\hat{\theta}_{MMI}</script>，这个估计被称为 MMI 估计。</p>
+&=\mathbb{H}(\mathbf{S})-\mathbb{H}(\mathbf{S}|\mathbf{O})\end{align}</script><p>同时 <script type="math/tex">\mathbb{H}(\mathbf{S})</script> 与待估计模型的参数无关。 所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{S})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{S}|\mathbf{O})</script>。极小化条件熵意味着在给定观测语音信号 <script type="math/tex">\mathbf{O}</script> 后，极小化词序列 <script type="math/tex">\mathbf{S}</script> 的不确定性。 </p>
+<p>又因为条件熵 </p>
+<script type="math/tex; mode=display">
+\begin{align}
+\mathbb{H}(\mathbf{S}|\mathbf{O}) &= \sum_{O}\mathbb{P}(O)\mathbb{H}(S|O)\\
+&=\sum_{O}\sum_{S}-\mathbb{P}(O)\mathbb{P}(S|O)\log\mathbb{P}(S|O)
+\end{align}</script><p>所以极大互信息 (MMI, maximum mutual information) 直接求使得 <script type="math/tex">\mathbb{P}_{\theta}(\mathbf{S}|\mathbf{O})</script> 极大的 <script type="math/tex">\hat{\theta}_{MMI}</script>，这个估计被称为 MMI 估计。</p>
 <p>为了简化计算，考虑下面的对数似然，</p>
 <script type="math/tex; mode=display">
 \begin{align}
