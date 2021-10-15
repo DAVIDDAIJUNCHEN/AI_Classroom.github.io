@@ -32,8 +32,19 @@
 <li>EB 算法利用辅助函数从理论上确保了算法的收敛和高效。</li>
 <li>EB 算法可以处理 HMM 中每个状态到其他状态的转移概率求和等于 1 以及 GMM 各分量权重求和等于 1 这两个等式约束条件。 </li>
 </ul>
-<p>​    下面是 GMM-HMM 模型的 EB 算法迭代公式， 证明的细节参考附录。</p>
-<h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><h3 id="2-4-Lattice-free-MMI"><a href="#2-4-Lattice-free-MMI" class="headerlink" title="2.4 Lattice-free MMI"></a>2.4 Lattice-free MMI</h3><h2 id="3-MMI-的拓展"><a href="#3-MMI-的拓展" class="headerlink" title="3. MMI 的拓展"></a>3. MMI 的拓展</h2><h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h2><h2 id="6-附录"><a href="#6-附录" class="headerlink" title="6. 附录"></a>6. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
+<p>​    下面是 GMM-HMM 模型的 EB 算法第 <script type="math/tex">k+1</script> 步的迭代公式， 证明的细节参考附录。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\mu_{jm}^{(k+1)} &= \frac{\theta^{num}_{jm}(\mathbf{O})-\theta_{jm}^{den}(\mathbf{O})+D_{jm}\cdot\mu_{jm}^{(k)}}{\gamma_{jm}^{num}-\gamma_{jm}^{den}+D_{jm}} \\
+(\sigma^{2})^{(k+1)}_{jm} &= \frac{\theta_{jm}^{num}(\mathbf{O}^{2})-\theta_{jm}^{den}(\mathbf{O}^2)+D_{jm}\cdot\big((\sigma^{2})_{jm}^{(k)}+(\mu_{jm}^{(k)})^2\big)}{\gamma_{jm}^{num}-\gamma_{jm}^{den}+D_{jm}}-(\mu_{jm}^{(k+1)})^{2}
+\end{align}</script><p>其中，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\gamma_{jm}^{num}(t) &=  \\
+\gamma_{jm}^{num} &= \sum_{t=1}^{T}\gamma_{jm}^{num}(t) \\
+\gamma_{jm}^{den} &= \sum_{t=1}^{T}\gamma_{jm}^{den}(t)  \\ 
+\theta_{jm}^{num}(\mathbf{O}) &= 
+\end{align}</script><h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><h3 id="2-4-Lattice-free-MMI"><a href="#2-4-Lattice-free-MMI" class="headerlink" title="2.4 Lattice-free MMI"></a>2.4 Lattice-free MMI</h3><h2 id="3-MMI-的拓展"><a href="#3-MMI-的拓展" class="headerlink" title="3. MMI 的拓展"></a>3. MMI 的拓展</h2><h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h2><h2 id="6-附录"><a href="#6-附录" class="headerlink" title="6. 附录"></a>6. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
 <h2 id="Cites"><a href="#Cites" class="headerlink" title="Cites"></a>Cites</h2><blockquote>
 <p>This is a cite</p>
 </blockquote>
