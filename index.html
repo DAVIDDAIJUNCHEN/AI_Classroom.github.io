@@ -240,10 +240,16 @@
 \end{align}</script><p>其中，</p>
 <script type="math/tex; mode=display">
 \begin{align}
-\gamma_{jm}^{num}(t) &=  \\
-\gamma_{jm}^{num} &= \sum_{t=1}^{T}\gamma_{jm}^{num}(t) \\
-\gamma_{jm}^{den} &= \sum_{t=1}^{T}\gamma_{jm}^{den}(t)  \\ 
-\theta_{jm}^{num}(\mathbf{O}) &= 
+f^{num}(\theta) &= \sum_{i=1}^{N}\log\mathbb{P}_{\theta}(O_{i}|S_{i})\mathbb{P}(S_{i}) = \sum_{i=1}^{N}\log\sum_{a_i}f^{num}_{a_i}(\theta) \\
+f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\mathbb{P}_{\theta}(S_i^j) = \sum_{i=1}^{N}\log\sum_{j}\sum_{a_{ij}}f^{den}_{a_{ij}}(\theta) \\
+\gamma_{ijm}^{num}(t) &= \sum_{a_{i}(t)=j}\frac{f^{num}_{a_{i}}(\theta^{(k)})}{\sum_{y}f^{num}_{y}(\theta^{(k)})},
+\gamma_{ijm}^{den}(t) = \sum_{l}\sum_{a_{il}(t)=j}\frac{f_{a_{il}}^{den}(\theta^{(k)})}{\sum_{y}f_{y}^{den}(\theta^{(k)})} \\
+\gamma_{jm}^{num} &= \sum_{i=1}^{N}\sum_{t=1}^{T}\gamma_{ijm}^{num}(t),
+\gamma_{jm}^{den} = \sum_{i=1}^{N}\sum_{t=1}^{T}\gamma_{ijm}^{den}(t) \\ 
+\theta_{jm}^{num}(\mathbf{O}) &= \sum_{i=1}^{N}\sum_{t=1}^{T}\gamma_{ijm}^{num}(t)O_i(t),
+\theta_{jm}^{den}(\mathbf{O}) = \sum_{i=1}^{N}\sum_{t=1}^{T}\gamma_{ijm}^{den}(t)O_i(t)\\
+\theta_{jm}^{num}(\mathbf{O}^2) &= \sum_{i=1}^{N}\sum_{t=1}^{T}\gamma_{ijm}^{num}(t)O_i^2(t), 
+\theta_{jm}^{den}(\mathbf{O}^2) = \sum_{i=1}^{N}\sum_{t=1}^{T}\gamma_{ijm}^{den}(t)O^2_{i}(t)
 \end{align}</script><h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><h3 id="2-4-Lattice-free-MMI"><a href="#2-4-Lattice-free-MMI" class="headerlink" title="2.4 Lattice-free MMI"></a>2.4 Lattice-free MMI</h3><h2 id="3-MMI-的拓展"><a href="#3-MMI-的拓展" class="headerlink" title="3. MMI 的拓展"></a>3. MMI 的拓展</h2><h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h2><h2 id="6-附录"><a href="#6-附录" class="headerlink" title="6. 附录"></a>6. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
 <h2 id="Cites"><a href="#Cites" class="headerlink" title="Cites"></a>Cites</h2><blockquote>
 <p>This is a cite</p>
