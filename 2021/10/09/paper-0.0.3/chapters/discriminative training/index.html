@@ -86,7 +86,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">2.4k</span>
+            <span class="post-count">2.6k</span>
         </span>
     </span>
 
@@ -95,7 +95,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">10 min</span>
+            <span class="post-count">11 min</span>
         </span>
     </span>
 </div>
@@ -164,11 +164,16 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <p><strong>实现步骤</strong></p>
 <ol>
 <li>分子部分 Lattice 的构造：基于极大似然准则训练好 GMM-HMM（或基于 CE 准则训练好 DNN-HMM 模型），将训练好的模型应用到正确标准的词序列和音频信号序列上进行状态级别的对齐并生成正确词序列对应的 Lattice。</li>
-<li>分母部分 Lattice 的构造: 利用 unigram 语言模型构建出 HCLG, 识别所有的训练例子 <script type="math/tex">(O_i, S_i)</script> 并保留识别过程中的 Lattice, <script type="math/tex">i=1,\dots,N</script>。 尽管在 [Povey, 2003] 文章中，主要利用 bigram 语言模型构建 HCLG，但是 Daniel 也提到利用 unigram 语言模型构建 HCLG 会得到更好的实验结果。</li>
-<li>Lattice-based MMI 的迭代训练: 基于 1. 和 2. 中构造的分子和分母 Lattice, 迭代更新 MMI 参数直到收敛。</li>
+<li>分母部分 Lattice 的构造: 利用 unigram 语言模型构建出 HCLG, 识别所有的训练例子 <script type="math/tex">(O_i, S_i)</script> 并保留识别过程中的 Lattice, <script type="math/tex">i=1,\dots,N</script>。 尽管在 [Povey, 2003] 文章中，主要利用 bigram 语言模型构建 HCLG，但是论文也提到利用 unigram 语言模型构建 HCLG 会得到更好的实验结果。</li>
+<li>Lattice-based MMI 的迭代训练: 对于一个训练样本 <script type="math/tex">(O_i, S_i)</script>，<ol>
+<li>基于 1. 中构造的分子 Lattice, 利用 unigram 语言模型得到正确路径的概率并计算 <script type="math/tex">\gamma_{ijm}^{num}</script> 的前向和后向概率。</li>
+<li>基于 2. 中构造的分母 Lattice, 构造正确路径对应的竞争路径集合，并利用 unigram 语言模型计算该竞争路径的概率，类似分子部分计算每条竞争路径的概率后求和得到 <script type="math/tex">\gamma_{ijm}^{den}</script> 。</li>
+<li>迭代更新模型参数至收敛，得到参数的 MMI 估计。</li>
+</ol>
+</li>
 </ol>
 <hr>
-<p>   上面的实现步骤中，利用两个不同的模型分别对分子和分母部分构建分子 Lattice 以及分母 Lattice。其中分母 Lattice 的构造， </p>
+<p>   上面的实现步骤中，利用两个不同的模型分别对分子和分母部分构建分子 Lattice 以及分母 Lattice。其中分母 Lattice 的构造， 利用了由简单的 unigram 语言模型组成的 HCLG 有限状态转移图。在 MMI 的迭代更新过程中，分母和分子部分的计算都利用了 unigram 语言模型计算路径的概率。在 [Povey, 2003] 的文章中， 在不同的测试集上比较了 bigram, unigram 以及 zerogram (无语言模型) 之后，证明 unigram 语言模型的表现一致地优于其他两种语言模型。 </p>
 <h3 id="2-4-Lattice-free-MMI"><a href="#2-4-Lattice-free-MMI" class="headerlink" title="2.4 Lattice-free MMI"></a>2.4 Lattice-free MMI</h3><h2 id="3-MMI-的拓展"><a href="#3-MMI-的拓展" class="headerlink" title="3. MMI 的拓展"></a>3. MMI 的拓展</h2><h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h2><h2 id="6-附录"><a href="#6-附录" class="headerlink" title="6. 附录"></a>6. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
 <h2 id="Cites"><a href="#Cites" class="headerlink" title="Cites"></a>Cites</h2><blockquote>
 <p>This is a cite</p>
