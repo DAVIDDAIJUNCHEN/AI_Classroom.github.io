@@ -89,7 +89,7 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <td>解释</td>
 <td style="text-align:center">尽管在某些测试集上，zerogram 模型或者按比例缩小的 unigram 模型优于 unigram, 但是会增加常用词的错误。</td>
 <td style="text-align:center">尽管在 MMI 的训练过程中，基于最新模型重新生成 Lattice 或对齐有最多 0.3% 的绝对 WER 提升，但是由于较高的计算复杂度，所以并不推荐在训练过程中更新 Lattice或对齐。</td>
-<td style="text-align:center">若备选路径 <script type="math/tex">p^{'}$$$$\log \mathbb{P}(p^{'})/\max\{\mathbf{P}(p)\}<阈值</script>，则对该路径进行剪枝。实验结果表明，阈值取100时，词错误率减小量不超过 0.2%。</td>
+<td style="text-align:center">若备选路径 <script type="math/tex">p^{'}</script>，<script type="math/tex">\log \mathbb{P}(p^{'})/\max\{\mathbf{P}(p)\}<阈值</script>，则对该路径进行剪枝。实验结果表明，阈值取100时，词错误率减小量不超过 0.2%。</td>
 </tr>
 </tbody>
 </table>
