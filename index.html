@@ -258,11 +258,11 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <ol>
 <li>分子部分 Lattice 的构造：基于极大似然准则训练好 GMM-HMM（或基于 CE 准则训练好 DNN-HMM 模型），将训练好的模型应用到正确标准的词序列和音频信号序列上进行状态级别的对齐并生成正确词序列对应的 Lattice。</li>
 <li>分母部分 Lattice 的构造: 利用 unigram 语言模型构建出 HCLG, 识别所有的训练例子 <script type="math/tex">(O_i, S_i)</script> 并保留识别过程中的 Lattice, <script type="math/tex">i=1,\dots,N</script>。 尽管在 [Povey, 2003] 文章中，主要利用 bigram 语言模型构建 HCLG，但是论文也提到利用 unigram 语言模型构建 HCLG 会得到更好的实验结果。</li>
-<li>Lattice-based MMI 的迭代训练: 对于一个训练样本 <script type="math/tex">(O_i, S_i)</script>，<ol>
+<li>Lattice-based MMI 的迭代训练: 对于一个训练样本 <script type="math/tex">(O_i, S_i)</script>，<ul>
 <li>基于 1. 中构造的分子 Lattice, 利用 unigram 语言模型得到正确路径的概率并计算 <script type="math/tex">\gamma_{ijm}^{num}</script> 的前向和后向概率。</li>
 <li>基于 2. 中构造的分母 Lattice, 构造正确路径对应的竞争路径集合，并利用 unigram 语言模型计算该竞争路径的概率，类似分子部分计算每条竞争路径的概率后求和得到 <script type="math/tex">\gamma_{ijm}^{den}</script> 。</li>
 <li>迭代更新模型参数至收敛，得到参数的 MMI 估计。</li>
-</ol>
+</ul>
 </li>
 </ol>
 <hr>
@@ -281,9 +281,9 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <tbody>
 <tr>
 <td>结论</td>
-<td style="text-align:center">unigram 优于 bigram 和 zerogram (无语言模型)</td>
-<td style="text-align:center">在训练 MMI 的过程中不需要更新 Lattice</td>
-<td style="text-align:center"></td>
+<td style="text-align:center">unigram 优于 bigram 和 zerogram (无语言模型) 。</td>
+<td style="text-align:center">在训练 MMI 的过程中不需要更新 Lattice。</td>
+<td style="text-align:center">存在一个合适的阈值，使得在不大幅减小 MMI 估计识别精度的前提下，可以减小 Lattice 的复杂度。</td>
 </tr>
 <tr>
 <td>解释</td>
