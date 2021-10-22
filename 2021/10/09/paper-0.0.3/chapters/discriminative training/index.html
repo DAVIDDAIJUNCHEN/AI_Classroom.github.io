@@ -180,23 +180,25 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <thead>
 <tr>
 <th></th>
-<th style="text-align:center">区分性训练中的语言模型</th>
-<th style="text-align:center">重新生成 Lattice</th>
-<th style="text-align:center">Lattice 的大小</th>
+<th>结论</th>
+<th>解释</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>结论</td>
-<td style="text-align:center">unigram 优于 bigram 和 zerogram (无语言模型) 。</td>
-<td style="text-align:center">在训练 MMI 的过程中不需要更新 Lattice。</td>
-<td style="text-align:center">存在一个合适的阈值，使得在不大幅减小最终 MMI 估计识别精度的前提下，可以减小 Lattice 的复杂度。</td>
+<td>区分性训练中的语言模型</td>
+<td>unigram 优于 bigram 和 zerogram (无语言模型) 。</td>
+<td>尽管在某些测试集上，zerogram 模型或者按比例缩小的 unigram 模型优于 unigram, 但是会增加常用词的错误。</td>
 </tr>
 <tr>
-<td>解释</td>
-<td style="text-align:center">尽管在某些测试集上，zerogram 模型或者按比例缩小的 unigram 模型优于 unigram, 但是会增加常用词的错误。</td>
-<td style="text-align:center">尽管在 MMI 的训练过程中，基于最新模型重新生成 Lattice 或对齐有最多 0.3% 的绝对 WER 提升，但是由于较高的计算复杂度，所以并不推荐在训练过程中更新 Lattice或对齐。</td>
-<td style="text-align:center">若备选路径 <script type="math/tex">p^{'}</script>，<script type="math/tex">\log \mathbb{P}(p^{'})/\max\{\mathbf{P}(p)\}<阈值</script>，则对该路径进行剪枝。实验结果表明，阈值取100时，词错误率减小量不超过 0.2%。</td>
+<td>重新生成 Lattice</td>
+<td>在训练 MMI 的过程中不需要更新 Lattice。</td>
+<td>尽管在 MMI 的训练过程中，基于最新模型重新生成 Lattice 或对齐有最多 0.3% 的绝对 WER 提升，但是由于较高的计算复杂度，所以并不推荐在训练过程中更新 Lattice或对齐。</td>
+</tr>
+<tr>
+<td>Lattice 的大小</td>
+<td>存在一个合适的阈值，使得在不大幅减小最终 MMI 估计识别精度的前提下，可以减小 Lattice 的复杂度。</td>
+<td>若备选路径 <script type="math/tex">p^{'}</script>，<script type="math/tex">\log \mathbb{P}(p^{'})/\max_{p}\{\mathbf{P}(p)\}<阈值</script>，则对该路径进行剪枝。实验结果表明，阈值取100时，词错误率减小量不超过 0.2%。</td>
 </tr>
 </tbody>
 </table>
