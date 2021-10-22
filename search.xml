@@ -3,10 +3,11 @@
   <entry>
     <title>序列区分性训练</title>
     <url>/2021/10/09/paper-0.0.3/chapters/discriminative%20training/</url>
-    <content><![CDATA[<p><h1 style="text-align: center"> 序列区分性训练 </h1></p>
+    <content><![CDATA[<p><h1 style="text-align: center"> 序列区分性训练 </p>
 <div style="text-align: center"><small>陈代君 - 2021</small></div>
 
-<hr>
+
+
 <h2 id="1-生成式模型的缺陷"><a href="#1-生成式模型的缺陷" class="headerlink" title="1. 生成式模型的缺陷"></a>1. 生成式模型的缺陷</h2><p>​    语音识别的本质可以用下面的公式进行描述，</p>
 <script type="math/tex; mode=display">
 \max_{S}\mathbb{P}(S|O)</script><p>其中 <script type="math/tex">O</script> 表示观测到的语音信号，<script type="math/tex">S</script> 表示词序列。传统的语音识别进一步分解上面的公式，</p>
