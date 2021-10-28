@@ -222,46 +222,12 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <p>如果上面公式中的 <script type="math/tex">A(S_i^j, S_i)</script> 度量备选文本 <script type="math/tex">S_i</script> 和正确文本 <script type="math/tex">S_i^j</script> 对齐之后正确词 (字) 的个数，则该目标函数被称为 MWE (Minimum Word Error) 准则。文本之间的对齐可以参考编辑距离的计算，或者考虑 WER 的计算过程。</p>
 <p>如果上面公式中的 <script type="math/tex">A(S_i^j, S_i)</script> 度量备选文本 <script type="math/tex">S_i</script> 和正确文本 <script type="math/tex">S_i^j</script> 在帧-状态级别的匹配程度，即利用训练好的 GMM-HMM 或者 DNN-HMM 对音频信号 <script type="math/tex">O_i</script> 和 <script type="math/tex">S_i</script> 以及 <script type="math/tex">S_i^j</script> 分别进行帧-状态级别的对齐，然后统计两个帧-状态对齐中结果相同的帧数， 则该目标函数被称为 sMBR (state-Minimum Bayesian Risk)。 </p>
 <p>不论是 MPE，MWE 或者 sMBR， 都是给予了和正确文本相似的备选文本较高的权重，优化目标函数之后得到的声学模型 <script type="math/tex">\mathbb{P}_{\theta}(O_i|S_i^j)</script> 在相似度高的文本上给予较高的声学得分，而在相似度低的文本上给予较低的声学得分。</p>
-<h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h2><h2 id="6-附录"><a href="#6-附录" class="headerlink" title="6. 附录"></a>6. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
+<p>对比 MPE 和 MWE 的目标函数，理论上，当训练数据量趋于无穷， MWE 的目标函数应该逼近模型的泛化 WER， 所以最小化 MWE 的目标函数应该和最小化 WER 的目标更匹配。  但是，在目前能够得到的训练集上，实验结果表明 MPE 在测试集上的表现比 MWE 的更好一些 [Povey, 2003]。</p>
+<h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-本章小结"><a href="#5-本章小结" class="headerlink" title="5. 本章小结"></a>5. 本章小结</h2><h2 id="6-参考资料"><a href="#6-参考资料" class="headerlink" title="6. 参考资料"></a>6. 参考资料</h2><h2 id="7-附录"><a href="#7-附录" class="headerlink" title="7. 附录"></a>7. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
 <h2 id="Cites"><a href="#Cites" class="headerlink" title="Cites"></a>Cites</h2><blockquote>
-<p>This is a cite</p>
+<p>[Povey ]e</p>
 </blockquote>
-<h2 id="Inline-math"><a href="#Inline-math" class="headerlink" title="Inline math:"></a>Inline math:</h2><p>Inline math <script type="math/tex">X^2 + 1 = 1</script> works fine.</p>
-<h2 id="Math-Block"><a href="#Math-Block" class="headerlink" title="Math Block:"></a>Math Block:</h2><script type="math/tex; mode=display">
-X^2 + 1 = 1</script><h2 id="Tables"><a href="#Tables" class="headerlink" title="Tables:"></a>Tables:</h2><div class="table-container">
-<table>
-<thead>
-<tr>
-<th>First Column</th>
-<th>Second Column</th>
-<th>Third Column</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>One</td>
-<td>Two</td>
-<td>Three</td>
-</tr>
-<tr>
-<td>Four</td>
-<td>Five</td>
-<td>Six</td>
-</tr>
-</tbody>
-</table>
-</div>
-<h2 id="Code"><a href="#Code" class="headerlink" title="Code:"></a>Code:</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> someCode <span class="keyword">from</span> <span class="string">&#x27;someLibrary&#x27;</span>;</span><br></pre></td></tr></table></figure>
-<h2 id="Lists"><a href="#Lists" class="headerlink" title="Lists"></a>Lists</h2><ul>
-<li>First item</li>
-<li>Second item<ul>
-<li>Third item<ul>
-<li>Another level</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<h2 id="Code"><a href="#Code" class="headerlink" title="Code:"></a>Code:</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> someCode <span class="keyword">from</span> <span class="string">&#x27;someLibrary&#x27;</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <h2 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h2><p><a href="www.google.com">This is a link</a></p>
 <h2 id="Footnote"><a href="#Footnote" class="headerlink" title="Footnote"></a>Footnote</h2><p>Some thing </p>
 <h2 id="Superscripts"><a href="#Superscripts" class="headerlink" title="Superscripts"></a>Superscripts</h2><p>Example^1^</p>
