@@ -211,7 +211,7 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 <script type="math/tex; mode=display">
 \sum_{i=1}^N\log\frac{\mathbb{P}_{\theta}(O_{i}|S_i)^{\alpha}\mathbb{P}(S_i)^{\alpha}}{\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)^{\alpha}\mathbb{P}(S_i^j)^{\alpha}}</script><p>其中 <script type="math/tex">\alpha</script> 被称为尺度因子 (scale factor)，<script type="math/tex">0<\alpha<1</script>。</p>
 <p>加入尺度因子之后，能够缩小备选词序列集合中词序列之间的概率差异，从而增加混淆路径的数量。使得最大化 scaled MMI 目标函数能够得到更具有区分性的声学模型 <script type="math/tex">\mathbb{P}_{\theta}(O_i|S_i)</script>。</p>
-<p><p align = "center"><br>    <img height="400px" src = "https://github.com/DAVIDDAIJUNCHEN/DAVIDDAIJUNCHEN.github.io/blob/main/images/chapters/images/scaleFactor.png"><br>    图 3-1 尺度因子对词序列概率的作用</p>
+<p><p align = "center"><br>    <img height="400px" src = "./images/scaleFactor.png"><br>    图 3-1 尺度因子对词序列概率的作用</p>
 <p>为了直观说明尺度因子<script type="math/tex">\alpha</script> 的作用，图 3-1 给出了四个不同的尺度因子条件下词序列概率 <script type="math/tex">\mathbb{P}(S_i^j)^{\alpha}</script> 的变化。 假设 <script type="math/tex">\mathbb{P}(S_i^1)=0.9, \mathbb{P}(S_i^2)=0.8</script>，两条红色的水平虚线和纵轴的交点间距表示 <script type="math/tex">\alpha=1</script> 时两个词序列概率的差；而两条蓝色的水平虚线和纵轴的交点间距表示 <script type="math/tex">\alpha=0.25</script> 时两个词序列概率的差。从图 3-1 中可以看到，蓝色的交点间距明显小于红色的交点间距，所以应用更小的尺度因子可以减小词序列概率间的差异。</p>
 <h3 id="3-2-BMMI"><a href="#3-2-BMMI" class="headerlink" title="3.2 BMMI"></a>3.2 BMMI</h3><p>增强的 MMI (BMMI, Boosted MMI) 目标函数为,</p>
 <script type="math/tex; mode=display">
