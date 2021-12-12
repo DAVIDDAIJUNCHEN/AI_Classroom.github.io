@@ -162,7 +162,7 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 \theta_{jm}^{num}(\mathbf{O}^2) &= \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{num}(t)O_i^2(t), 
 \theta_{jm}^{den}(\mathbf{O}^2) = \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{den}(t)O^2_{i}(t)
 \end{align}</script><p>上面的参数更新公式中，<script type="math/tex">\gamma_{ijm}^{den}(t)</script> 的计算需要遍历所有可能的词序列。因为所有可能的词序列数量巨大，所以直接通过上面的更新公式来求解参数的 MMI 估计几乎是不可能的。 为了克服这个计算上的困难，下面两个小节将介绍两种解决方法。</p>
-<h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><p>​    为了加速 MMI 的计算量，早期的工作主要集中在使用 N-best 列表来近似 MMI 分母中所有可能词序列的集合。但是对于非常长的词序列，LM 计算出来的概率都接近于零，导致 N-best 中存储的备选词序列不能很好地近似分母所需的词序列集合 [Chow, 1990] 。另一种逼近 MMI 分母词序列的方案中，对每一个训练词序列生成一个 Lattice（词格），该 Lattice 将会被应用到 MMI 训练且在迭代过程不会被更新 [Povey, 2003]。</p>
+<h4 id="2-2-2-DNN-HMM"><a href="#2-2-2-DNN-HMM" class="headerlink" title="2.2.2 DNN-HMM"></a>2.2.2 DNN-HMM</h4><h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><p>​    为了加速 MMI 的计算量，早期的工作主要集中在使用 N-best 列表来近似 MMI 分母中所有可能词序列的集合。但是对于非常长的词序列，LM 计算出来的概率都接近于零，导致 N-best 中存储的备选词序列不能很好地近似分母所需的词序列集合 [Chow, 1990] 。另一种逼近 MMI 分母词序列的方案中，对每一个训练词序列生成一个 Lattice（词格），该 Lattice 将会被应用到 MMI 训练且在迭代过程不会被更新 [Povey, 2003]。</p>
 <p>​    Lattice-based MMI 的具体实现步骤如下，</p>
 <hr>
 <p><strong>实现步骤</strong></p>
@@ -313,6 +313,20 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
   </div>
 
    
+  <nav class="article-nav">
+    
+      <a href="/2021/11/23/paper-0.0.3/chapters/kaldi%20tutorial/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            序列区分性训练
+          
+        </div>
+      </a>
+    
+    
+  </nav>
+
    
 <!-- valine评论 -->
 <div id="vcomments-box">

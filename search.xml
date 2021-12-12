@@ -2,6 +2,104 @@
 <search>
   <entry>
     <title>序列区分性训练</title>
+    <url>/2021/11/23/paper-0.0.3/chapters/kaldi%20tutorial/</url>
+    <content><![CDATA[<p><h1 style="text-align: center"> Kaldi 示例 </h1></p>
+<div style="text-align: center"><small>陈代君 - 2021</small></div>
+
+
+
+
+<h2 id="1-Kaldi-简介"><a href="#1-Kaldi-简介" class="headerlink" title="1. Kaldi 简介"></a>1. Kaldi 简介</h2><h3 id="1-1-名字来历"><a href="#1-1-名字来历" class="headerlink" title="1.1 名字来历"></a>1.1 名字来历</h3><p>Kaldi 是埃塞俄比亚的牧羊人，发现了咖啡树。因为 Kaldi 最初诞生于 2009 年约翰霍普金斯大学的夏季研讨会，参与研讨会的研究人员当中多数都是咖啡的爱好者，于是 Kaldi 的创作者使用发现咖啡树的人名字命名该语音解码器。后来这个解码器继续开发成了现在的 Kaldi 语音识别工具。</p>
+<h3 id="1-2-发展历程"><a href="#1-2-发展历程" class="headerlink" title="1.2 发展历程"></a>1.2 发展历程</h3><ul>
+<li>2009 年约翰霍普金斯大学夏季研讨会，仅含有轻量级解码器和 HTK 训练脚本。</li>
+<li>2010 年的 Kaldi 研讨会，完善了语音识别工具包功能。</li>
+<li>2011 年 正式发布 Kaldi 的代码库，同时在同年的 Kaldi 研讨会，基于GMM 和 SGMM 区分性训练脚本被开发。</li>
+<li>2012 年 Kaldi 研讨会， nnet1 的区分性训练和 stacked-bottleneck 网络。</li>
+<li>2013 年 Kaldi 研讨会补充完善 Kaldi。</li>
+<li>2014 年 JSALT 研讨会，讨论了神经网络内部结构和语音识别的置信度分析。</li>
+<li>2015年开始 nnet3 的开发。</li>
+</ul>
+<h3 id="1-3-Kaldi-特点"><a href="#1-3-Kaldi-特点" class="headerlink" title="1.3 Kaldi 特点"></a>1.3 Kaldi 特点</h3><ul>
+<li>最开始由于开发人员多使用过 HTK, 同时很多开发者都来自于剑桥大学，比如 Daniel Povey, 所以最开始 Kaldi 和 HTK 很类似。</li>
+<li>底层源码由 C++ 编写，上层代码由 Python, Perl, shell 组成。</li>
+<li>总是包含最新的语音技术。</li>
+<li>开源，采用了 Apache License Version 2.0。即可以利用 Kaldi 进行商用。</li>
+<li>缺点，文档不全。所以通过给予示例的形式来分享成果。</li>
+</ul>
+<h2 id="2-Yes-No-例子"><a href="#2-Yes-No-例子" class="headerlink" title="2. Yes/No 例子"></a>2. Yes/No 例子</h2><p>省略安装步骤，可以直接在CRG 上面调用配置好的 docker 环境，进入到编译好的 kaldi 环境中。</p>
+<p><code>alias kaldi=&#39;/asr/build/container/lmtools/mkl/shell.sh&#39;</code></p>
+<p>Yes/No 例子是 Kaldi 当中最简单的一个示例，但是却包含了通常 ASR 模型构建的主干内容。所以学习了这个案例之后，对于 ASR 的基本流程会有一个较为清晰的认识。</p>
+<h3 id="2-1-运行脚本"><a href="#2-1-运行脚本" class="headerlink" title="2.1 运行脚本"></a>2.1 运行脚本</h3><p><p align = "center"><br>    <img height="600px" src = "./images/YesNoStruct.png"><br>    图 2-1. YesNo 案例的文件结构</p>
+<p>Kaldi 的所有示例的主脚本是最外层文件夹下面的 run.sh, 其余的脚本和文件都在主脚本运行的过程中被调用。</p>
+<p><code>./run.sh</code></p>
+<h3 id="2-2-运行结果"><a href="#2-2-运行结果" class="headerlink" title="2.2 运行结果"></a>2.2 运行结果</h3><p>运行该脚本仅需要非常短的时间，大概 2~3 分钟之后便会得到如下所示的结果。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">local</span>/score.sh: scoring with word insertion penalty=0.0,0.5,1.0</span><br><span class="line">exp/mono0a/decode_test_yesno/wer_9_0.5:%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ]</span><br><span class="line">exp/mono0a/decode_test_yesno/wer_9_1.0:%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ]</span><br><span class="line">%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ] exp/mono0a/decode_test_yesno/wer_10_0.0</span><br></pre></td></tr></table></figure>
+<p>上面的内容显示在解码过程中使用了0.0，0.5，1.0 的词嵌入惩罚之后，得到的 WER 为 0，[ 0 / 232, 0 ins, 0 del, 0 sub ] 表示在 232 个测试单词上有 0 个错误，0 个错误中有 0 个是 insertion (插入错误)，0 个 deletion (删除错误)， 0 个 substitution (替换错误)。最后一行表示最好的测试结果出现在解码参数为 (10, 0) 组合条件下。</p>
+<h3 id="2-3-主脚本层面解读"><a href="#2-3-主脚本层面解读" class="headerlink" title="2.3 主脚本层面解读"></a>2.3 主脚本层面解读</h3><p>主脚本非常简单，总共包含了 49 行代码。</p>
+<h4 id="2-3-1-训练-解码命令定义"><a href="#2-3-1-训练-解码命令定义" class="headerlink" title="2.3.1 训练/解码命令定义"></a>2.3.1 训练/解码命令定义</h4><p>在代码的最开始部分，定义了使用何种方式来训练和解码。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"></span><br><span class="line">train_cmd=<span class="string">&quot;utils/run.pl&quot;</span></span><br><span class="line">decode_cmd=<span class="string">&quot;utils/run.pl&quot;</span></span><br><span class="line"><span class="comment">#train_cmd=&quot;utils/slurm.pl&quot;</span></span><br><span class="line"><span class="comment">#decode_cmd=&quot;utils/slurm.pl&quot;</span></span><br></pre></td></tr></table></figure>
+<p>上面的 两个变量 train_cmd 和 decode_cmd 分别定义了使用 utils/run.pl 来多任务的执行程序。执行如下命令行，</p>
+<blockquote>
+<p>utils/run.pl JOB=1:3 ./log.JOB echo “run job JOB”</p>
+</blockquote>
+<p>如上的命令执行了三个 echo 命令，并把屏幕上的标准输出写到 ./log.1-3 三个文件当中。其中的 log.1 日志文件如下，记录了实际命令，开始时间，屏幕输出，结束时间。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># echo &quot;run job 1&quot;</span></span><br><span class="line"><span class="comment"># Started at Tue Nov 23 20:54:47 EST 2021</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">run job 1</span><br><span class="line"><span class="comment"># Accounting: time=0 threads=1</span></span><br><span class="line"><span class="comment"># Ended (code 0) at Tue Nov 23 20:54:47 EST 2021, elapsed time 0 seconds</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>kaldi 的主脚本 run.sh，在模型训练和解码的过程中，分别使用了上面介绍的两个变量，</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Mono training</span></span><br><span class="line">steps/train_mono.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$train_cmd</span>&quot;</span> \</span><br><span class="line">  --totgauss 400 \</span><br><span class="line">  data/train_yesno data/lang exp/mono0a </span><br><span class="line">  </span><br><span class="line"><span class="comment"># Decoding</span></span><br><span class="line">steps/decode.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$decode_cmd</span>&quot;</span> \</span><br><span class="line">    exp/mono0a/graph_tgpr data/test_yesno exp/mono0a/decode_test_yesno</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-2-数据获取"><a href="#2-3-2-数据获取" class="headerlink" title="2.3.2 数据获取"></a>2.3.2 数据获取</h4><p>完成了定义训练/解码模型的方式，接下来开始下载和解压数据</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> [ ! -d waves_yesno ]; <span class="keyword">then</span></span><br><span class="line">  wget http://www.openslr.org/resources/1/waves_yesno.tar.gz || <span class="built_in">exit</span> 1;</span><br><span class="line">  <span class="comment"># was:</span></span><br><span class="line">  <span class="comment"># wget http://sourceforge.net/projects/kaldi/files/waves_yesno.tar.gz || exit 1;</span></span><br><span class="line">  tar -xvzf waves_yesno.tar.gz || <span class="built_in">exit</span> 1;</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">train_yesno=train_yesno</span><br><span class="line">test_base_name=test_yesno</span><br></pre></td></tr></table></figure>
+<p>上面代码首先从 OpenSLR 网站上下载名为 waves_yesno.tar.gz 的文件， 然后解包到 waves_yesno 路径。该压缩文件中包含了所有建模过程中所使用到的训练及测试数据, 一共是 60 个如下 wav 格式音频数据。</p>
+<p><p align = "center"><br>    <img height="90px" src = "./images/YesNoWav.png"><br>    图 2-2. waves_yesno 目录案例</p>
+<p>图 2-2 中展示了解压之后文件夹 waves_yesno 下部分音频文件的文件名。这些文件均包含了 8 个以 1/0/_ 进行命名的文件，其中 1 表示 Yes, 0 表示 No, 使用下划线进行连接来表示该语音片段所包含内容的标签。</p>
+<p>通常来说，除了需要准备音频文件外，还需提供与音频文件对齐的标注文本 (transcription)，通过id来进行对齐。但是yes/no 示例中，直接使用音频对应的标注作为文件名。</p>
+<h4 id="2-3-3-数据整理"><a href="#2-3-3-数据整理" class="headerlink" title="2.3.3 数据整理"></a>2.3.3 数据整理</h4><ol>
+<li><p><strong>训练和测试数据准备</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># Data preparation</span><br><span class="line">local/prepare_data.sh waves_yesno</span><br></pre></td></tr></table></figure>
+<p>执行上面的命令行后，会得到两个数据集，data/train_yesno 和 data/test_yesno,</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">train_yesno/</span><br><span class="line">├── spk2utt</span><br><span class="line">├── text</span><br><span class="line">├── utt2dur</span><br><span class="line">├── utt2spk</span><br><span class="line">└── wav.scp</span><br><span class="line"></span><br><span class="line">dev_yesno/</span><br><span class="line">├── spk2utt</span><br><span class="line">├── text</span><br><span class="line">├── utt2dur</span><br><span class="line">├── utt2spk</span><br><span class="line">└── wav.scp</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>人工准备资源</strong></p>
+<p>在 input 下面需要一些人工准备的资源，</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">input/</span><br><span class="line">├── lexicon_nosil.txt</span><br><span class="line">├── lexicon.txt</span><br><span class="line">├── phones.txt</span><br><span class="line">└── task.arpabo</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>lexicon.txt</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">YES Y</span><br><span class="line">NO N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>lexicon_nosil.txt</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;SIL&gt; SIL</span><br><span class="line">YES Y</span><br><span class="line">NO N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>phones.txt</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">SIL</span><br><span class="line">Y</span><br><span class="line">N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>task.arpabo</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">\data\</span><br><span class="line">ngram 1=4</span><br><span class="line"></span><br><span class="line">\1-grams:</span><br><span class="line">-1      NO</span><br><span class="line">-1      YES</span><br><span class="line">-99 &lt;s&gt;</span><br><span class="line">-1 &lt;/s&gt;</span><br><span class="line"></span><br><span class="line">\end\</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><strong>准备语言文件夹</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">local</span>/prepare_dict.sh</span><br><span class="line">utils/prepare_lang.sh --position-dependent-phones <span class="literal">false</span> data/<span class="built_in">local</span>/dict <span class="string">&quot;&lt;SIL&gt;&quot;</span> data/<span class="built_in">local</span>/lang data/lang</span><br><span class="line"><span class="built_in">local</span>/prepare_lm.sh</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;finished &quot;</span></span><br></pre></td></tr></table></figure>
+<p>前两行准备 data/lang （语言文件夹）。第三行脚本准备 lm，将 arpa 格式的 LM 转换成 WFST 的格式。</p>
+</li>
+</ol>
+<h4 id="2-3-4-提取声学特征"><a href="#2-3-4-提取声学特征" class="headerlink" title="2.3.4 提取声学特征"></a>2.3.4 提取声学特征</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Feature extraction</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> train_yesno test_yesno; <span class="keyword">do</span> </span><br><span class="line"> steps/make_mfcc.sh --nj 1 data/<span class="variable">$x</span> exp/make_mfcc/<span class="variable">$x</span> mfcc</span><br><span class="line"> steps/compute_cmvn_stats.sh data/<span class="variable">$x</span> exp/make_mfcc/<span class="variable">$x</span> mfcc</span><br><span class="line"> utils/fix_data_dir.sh data/<span class="variable">$x</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>执行了如上脚本之后，可以到 data/train_yesno 以及 data/dev_yesno 两个数据集对应的 feats.scp 文件，其中 data/train_yesno/feats.scp 文件如下，</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0_0_0_0_1_1_1_1 /mnt/users/daijun_chen/gits/github/kaldi/egs/yesno/s5/mfcc/raw_mfcc_train_yesno.1.ark:16</span><br><span class="line">0_0_0_1_0_0_0_1 /mnt/users/daijun_chen/gits/github/kaldi/egs/yesno/s5/mfcc/raw_mfcc_train_yesno.1.ark:8386</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-5-声学模型的训练"><a href="#2-3-5-声学模型的训练" class="headerlink" title="2.3.5 声学模型的训练"></a>2.3.5 声学模型的训练</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Mono training</span></span><br><span class="line">steps/train_mono.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$train_cmd</span>&quot;</span> \</span><br><span class="line">  --totgauss 400 \</span><br><span class="line">  data/train_yesno data/lang exp/mono0a </span><br></pre></td></tr></table></figure>
+<h4 id="2-3-6-构建状态图-HCLG"><a href="#2-3-6-构建状态图-HCLG" class="headerlink" title="2.3.6 构建状态图 HCLG"></a>2.3.6 构建状态图 HCLG</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Graph compilation  </span></span><br><span class="line">utils/mkgraph.sh data/lang_test_tg exp/mono0a exp/mono0a/graph_tgpr</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-7-使用解码器进行解码"><a href="#2-3-7-使用解码器进行解码" class="headerlink" title="2.3.7 使用解码器进行解码"></a>2.3.7 使用解码器进行解码</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Decoding</span></span><br><span class="line">steps/decode.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$decode_cmd</span>&quot;</span> \</span><br><span class="line">    exp/mono0a/graph_tgpr data/test_yesno exp/mono0a/decode_test_yesno</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> exp/*/decode*; <span class="keyword">do</span> [ -d <span class="variable">$x</span> ] &amp;&amp; grep WER <span class="variable">$x</span>/wer_*; <span class="keyword">done</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> exp/*/decode*; <span class="keyword">do</span> [ -d <span class="variable">$x</span> ] &amp;&amp; grep WER <span class="variable">$x</span>/wer_* | utils/best_wer.sh; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>输出的声学模型在路径 exp/mono0a 下面，</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mono0a/</span><br><span class="line">├── 0.mdl</span><br><span class="line">├── 40.mdl</span><br><span class="line">├── 40.occs</span><br><span class="line">├── ali.1.gz</span><br><span class="line">├── cmvn_opts</span><br><span class="line">├── decode_test_yesno</span><br><span class="line">│   ├── lat.1.gz</span><br><span class="line">│   ├── log</span><br><span class="line">│   ├── num_jobs</span><br><span class="line">│   ├── scoring_kaldi</span><br><span class="line">│   │   ├── best_wer</span><br><span class="line">│   │   ├── log</span><br><span class="line">│   │   ├── penalty_0.0</span><br><span class="line">│   │   │   ├── *.txt</span><br><span class="line">│   │   │   └── log</span><br><span class="line">│   │   ├── penalty_0.5</span><br><span class="line">│   │   │   ├── *.txt</span><br><span class="line">│   │   │   └── log</span><br><span class="line">│   │   ├── penalty_1.0</span><br><span class="line">│   │   │   ├── *.txt</span><br><span class="line">│   │   │   └── log</span><br><span class="line">│   │   ├── test_filt.txt</span><br><span class="line">│   │   └── wer_details</span><br><span class="line">│   │       ├── lmwt</span><br><span class="line">│   │       ├── ops</span><br><span class="line">│   │       ├── per_spk</span><br><span class="line">│   │       ├── per_utt</span><br><span class="line">│   │       ├── wer_bootci</span><br><span class="line">│   │       └── wip</span><br><span class="line">│   ├── wer_10_*.*</span><br><span class="line">├── final.mdl -&gt; 40.mdl</span><br><span class="line">├── final.occs -&gt; 40.occs</span><br><span class="line">├── fsts.1.gz</span><br><span class="line">├── graph_tgpr</span><br><span class="line">│   ├── disambig_tid.int</span><br><span class="line">│   ├── HCLG.fst</span><br><span class="line">│   ├── num_pdfs</span><br><span class="line">│   ├── phones</span><br><span class="line">│   │   ├── align_lexicon.int</span><br><span class="line">│   │   ├── align_lexicon.txt</span><br><span class="line">│   │   ├── disambig.int</span><br><span class="line">│   │   ├── disambig.txt</span><br><span class="line">│   │   ├── optional_silence.csl</span><br><span class="line">│   │   ├── optional_silence.int</span><br><span class="line">│   │   ├── optional_silence.txt</span><br><span class="line">│   │   └── silence.csl</span><br><span class="line">│   ├── phones.txt</span><br><span class="line">│   └── words.txt</span><br><span class="line">├── log</span><br><span class="line">├── num_jobs</span><br><span class="line">├── phones.txt</span><br><span class="line">└── tree</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-8-识别结果样例"><a href="#2-3-8-识别结果样例" class="headerlink" title="2.3.8 识别结果样例"></a>2.3.8 识别结果样例</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">1_0_0_0_0_0_0_0 YES NO NO NO NO NO NO NO</span><br><span class="line">1_0_0_0_0_0_0_1 YES NO NO NO NO NO NO YES</span><br><span class="line">1_0_0_0_0_0_1_1 YES NO NO NO NO NO YES YES</span><br><span class="line">1_0_0_0_1_0_0_1 YES NO NO NO YES NO NO YES</span><br><span class="line">1_0_0_1_0_1_1_1 YES NO NO YES NO YES YES YES</span><br><span class="line">1_0_1_0_1_0_0_1 YES NO YES NO YES NO NO YES</span><br><span class="line">1_0_1_1_0_1_1_1 YES NO YES YES NO YES YES YES</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>人工智能</category>
+      </categories>
+      <tags>
+        <tag>语音识别</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>序列区分性训练</title>
     <url>/2021/10/09/paper-0.0.3/chapters/discriminative%20training/</url>
     <content><![CDATA[<p><h1 style="text-align: center"> 序列区分性训练 </h1></p>
 <div style="text-align: center"><small>陈代君 - 2021</small></div>
@@ -55,7 +153,7 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 \theta_{jm}^{num}(\mathbf{O}^2) &= \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{num}(t)O_i^2(t), 
 \theta_{jm}^{den}(\mathbf{O}^2) = \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{den}(t)O^2_{i}(t)
 \end{align}</script><p>上面的参数更新公式中，<script type="math/tex">\gamma_{ijm}^{den}(t)</script> 的计算需要遍历所有可能的词序列。因为所有可能的词序列数量巨大，所以直接通过上面的更新公式来求解参数的 MMI 估计几乎是不可能的。 为了克服这个计算上的困难，下面两个小节将介绍两种解决方法。</p>
-<h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><p>​    为了加速 MMI 的计算量，早期的工作主要集中在使用 N-best 列表来近似 MMI 分母中所有可能词序列的集合。但是对于非常长的词序列，LM 计算出来的概率都接近于零，导致 N-best 中存储的备选词序列不能很好地近似分母所需的词序列集合 [Chow, 1990] 。另一种逼近 MMI 分母词序列的方案中，对每一个训练词序列生成一个 Lattice（词格），该 Lattice 将会被应用到 MMI 训练且在迭代过程不会被更新 [Povey, 2003]。</p>
+<h4 id="2-2-2-DNN-HMM"><a href="#2-2-2-DNN-HMM" class="headerlink" title="2.2.2 DNN-HMM"></a>2.2.2 DNN-HMM</h4><h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><p>​    为了加速 MMI 的计算量，早期的工作主要集中在使用 N-best 列表来近似 MMI 分母中所有可能词序列的集合。但是对于非常长的词序列，LM 计算出来的概率都接近于零，导致 N-best 中存储的备选词序列不能很好地近似分母所需的词序列集合 [Chow, 1990] 。另一种逼近 MMI 分母词序列的方案中，对每一个训练词序列生成一个 Lattice（词格），该 Lattice 将会被应用到 MMI 训练且在迭代过程不会被更新 [Povey, 2003]。</p>
 <p>​    Lattice-based MMI 的具体实现步骤如下，</p>
 <hr>
 <p><strong>实现步骤</strong></p>
