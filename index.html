@@ -172,6 +172,146 @@
     
     
     <article
+  id="post-paper-0.0.3/chapters/rnn_lm"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2021/12/19/paper-0.0.3/chapters/rnn_lm/"
+    >Kaldi 示例</a> 
+</h2>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2021/12/19/paper-0.0.3/chapters/rnn_lm/" class="article-date">
+  <time datetime="2021-12-19T09:13:29.561Z" itemprop="datePublished">2021-12-19</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p><h1 style="text-align: center"> Kaldi 示例 </h1></p>
+<div style="text-align: center"><small>陈代君 - 2021</small></div>
+
+
+
+
+<h2 id="1-Kaldi-简介"><a href="#1-Kaldi-简介" class="headerlink" title="1. Kaldi 简介"></a>1. Kaldi 简介</h2><h3 id="1-1-名字来历"><a href="#1-1-名字来历" class="headerlink" title="1.1 名字来历"></a>1.1 名字来历</h3><p>Kaldi 是埃塞俄比亚的牧羊人，发现了咖啡树。因为 Kaldi 最初诞生于 2009 年约翰霍普金斯大学的夏季研讨会，参与研讨会的研究人员当中多数都是咖啡的爱好者，于是 Kaldi 的创作者使用发现咖啡树的人名字命名该语音解码器。后来这个解码器继续开发成了现在的 Kaldi 语音识别工具。</p>
+<h3 id="1-2-发展历程"><a href="#1-2-发展历程" class="headerlink" title="1.2 发展历程"></a>1.2 发展历程</h3><ul>
+<li>2009 年约翰霍普金斯大学夏季研讨会，仅含有轻量级解码器和 HTK 训练脚本。</li>
+<li>2010 年的 Kaldi 研讨会，完善了语音识别工具包功能。</li>
+<li>2011 年 正式发布 Kaldi 的代码库，同时在同年的 Kaldi 研讨会，基于GMM 和 SGMM 区分性训练脚本被开发。</li>
+<li>2012 年 Kaldi 研讨会， nnet1 的区分性训练和 stacked-bottleneck 网络。</li>
+<li>2013 年 Kaldi 研讨会补充完善 Kaldi。</li>
+<li>2014 年 JSALT 研讨会，讨论了神经网络内部结构和语音识别的置信度分析。</li>
+<li>2015年开始 nnet3 的开发。</li>
+</ul>
+<h3 id="1-3-Kaldi-特点"><a href="#1-3-Kaldi-特点" class="headerlink" title="1.3 Kaldi 特点"></a>1.3 Kaldi 特点</h3><ul>
+<li>最开始由于开发人员多使用过 HTK, 同时很多开发者都来自于剑桥大学，比如 Daniel Povey, 所以最开始 Kaldi 和 HTK 很类似。</li>
+<li>底层源码由 C++ 编写，上层代码由 Python, Perl, shell 组成。</li>
+<li>总是包含最新的语音技术。</li>
+<li>开源，采用了 Apache License Version 2.0。即可以利用 Kaldi 进行商用。</li>
+<li>缺点，文档不全。所以通过给予示例的形式来分享成果。</li>
+</ul>
+<h2 id="2-Yes-No-例子"><a href="#2-Yes-No-例子" class="headerlink" title="2. Yes/No 例子"></a>2. Yes/No 例子</h2><p>省略安装步骤，可以直接在CRG 上面调用配置好的 docker 环境，进入到编译好的 kaldi 环境中。</p>
+<p><code>alias kaldi=&#39;/asr/build/container/lmtools/mkl/shell.sh&#39;</code></p>
+<p>Yes/No 例子是 Kaldi 当中最简单的一个示例，但是却包含了通常 ASR 模型构建的主干内容。所以学习了这个案例之后，对于 ASR 的基本流程会有一个较为清晰的认识。</p>
+<h3 id="2-1-运行脚本"><a href="#2-1-运行脚本" class="headerlink" title="2.1 运行脚本"></a>2.1 运行脚本</h3><p><p align = "center"><br>    <img height="600px" src = "./images/YesNoStruct.png"><br>    图 2-1. YesNo 案例的文件结构</p>
+<p>Kaldi 的所有示例的主脚本是最外层文件夹下面的 run.sh, 其余的脚本和文件都在主脚本运行的过程中被调用。</p>
+<p><code>./run.sh</code></p>
+<h3 id="2-2-运行结果"><a href="#2-2-运行结果" class="headerlink" title="2.2 运行结果"></a>2.2 运行结果</h3><p>运行该脚本仅需要非常短的时间，大概 2~3 分钟之后便会得到如下所示的结果。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">local</span>/score.sh: scoring with word insertion penalty=0.0,0.5,1.0</span><br><span class="line">exp/mono0a/decode_test_yesno/wer_9_0.5:%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ]</span><br><span class="line">exp/mono0a/decode_test_yesno/wer_9_1.0:%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ]</span><br><span class="line">%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ] exp/mono0a/decode_test_yesno/wer_10_0.0</span><br></pre></td></tr></table></figure>
+<p>上面的内容显示在解码过程中使用了0.0，0.5，1.0 的词嵌入惩罚之后，得到的 WER 为 0，[ 0 / 232, 0 ins, 0 del, 0 sub ] 表示在 232 个测试单词上有 0 个错误，0 个错误中有 0 个是 insertion (插入错误)，0 个 deletion (删除错误)， 0 个 substitution (替换错误)。最后一行表示最好的测试结果出现在解码参数为 (10, 0) 组合条件下。</p>
+<h3 id="2-3-主脚本层面解读"><a href="#2-3-主脚本层面解读" class="headerlink" title="2.3 主脚本层面解读"></a>2.3 主脚本层面解读</h3><p>主脚本非常简单，总共包含了 49 行代码。</p>
+<h4 id="2-3-1-训练-解码命令定义"><a href="#2-3-1-训练-解码命令定义" class="headerlink" title="2.3.1 训练/解码命令定义"></a>2.3.1 训练/解码命令定义</h4><p>在代码的最开始部分，定义了使用何种方式来训练和解码。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"></span><br><span class="line">train_cmd=<span class="string">&quot;utils/run.pl&quot;</span></span><br><span class="line">decode_cmd=<span class="string">&quot;utils/run.pl&quot;</span></span><br><span class="line"><span class="comment">#train_cmd=&quot;utils/slurm.pl&quot;</span></span><br><span class="line"><span class="comment">#decode_cmd=&quot;utils/slurm.pl&quot;</span></span><br></pre></td></tr></table></figure>
+<p>上面的 两个变量 train_cmd 和 decode_cmd 分别定义了使用 utils/run.pl 来多任务的执行程序。执行如下命令行，</p>
+<blockquote>
+<p>utils/run.pl JOB=1:3 ./log.JOB echo “run job JOB”</p>
+</blockquote>
+<p>如上的命令执行了三个 echo 命令，并把屏幕上的标准输出写到 ./log.1-3 三个文件当中。其中的 log.1 日志文件如下，记录了实际命令，开始时间，屏幕输出，结束时间。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># echo &quot;run job 1&quot;</span></span><br><span class="line"><span class="comment"># Started at Tue Nov 23 20:54:47 EST 2021</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">run job 1</span><br><span class="line"><span class="comment"># Accounting: time=0 threads=1</span></span><br><span class="line"><span class="comment"># Ended (code 0) at Tue Nov 23 20:54:47 EST 2021, elapsed time 0 seconds</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>kaldi 的主脚本 run.sh，在模型训练和解码的过程中，分别使用了上面介绍的两个变量，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Mono training</span></span><br><span class="line">steps/train_mono.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$train_cmd</span>&quot;</span> \</span><br><span class="line">  --totgauss 400 \</span><br><span class="line">  data/train_yesno data/lang exp/mono0a </span><br><span class="line">  </span><br><span class="line"><span class="comment"># Decoding</span></span><br><span class="line">steps/decode.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$decode_cmd</span>&quot;</span> \</span><br><span class="line">    exp/mono0a/graph_tgpr data/test_yesno exp/mono0a/decode_test_yesno</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-2-数据获取"><a href="#2-3-2-数据获取" class="headerlink" title="2.3.2 数据获取"></a>2.3.2 数据获取</h4><p>完成了定义训练/解码模型的方式，接下来开始下载和解压数据</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> [ ! -d waves_yesno ]; <span class="keyword">then</span></span><br><span class="line">  wget http://www.openslr.org/resources/1/waves_yesno.tar.gz || <span class="built_in">exit</span> 1;</span><br><span class="line">  <span class="comment"># was:</span></span><br><span class="line">  <span class="comment"># wget http://sourceforge.net/projects/kaldi/files/waves_yesno.tar.gz || exit 1;</span></span><br><span class="line">  tar -xvzf waves_yesno.tar.gz || <span class="built_in">exit</span> 1;</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">train_yesno=train_yesno</span><br><span class="line">test_base_name=test_yesno</span><br></pre></td></tr></table></figure>
+<p>上面代码首先从 OpenSLR 网站上下载名为 waves_yesno.tar.gz 的文件， 然后解包到 waves_yesno 路径。该压缩文件中包含了所有建模过程中所使用到的训练及测试数据, 一共是 60 个如下 wav 格式音频数据。</p>
+<p><p align = "center"><br>    <img height="90px" src = "./images/YesNoWav.png"><br>    图 2-2. waves_yesno 目录案例</p>
+<p>图 2-2 中展示了解压之后文件夹 waves_yesno 下部分音频文件的文件名。这些文件均包含了 8 个以 1/0/_ 进行命名的文件，其中 1 表示 Yes, 0 表示 No, 使用下划线进行连接来表示该语音片段所包含内容的标签。</p>
+<p>通常来说，除了需要准备音频文件外，还需提供与音频文件对齐的标注文本 (transcription)，通过id来进行对齐。但是yes/no 示例中，直接使用音频对应的标注作为文件名。</p>
+<h4 id="2-3-3-数据整理"><a href="#2-3-3-数据整理" class="headerlink" title="2.3.3 数据整理"></a>2.3.3 数据整理</h4><ol>
+<li><p><strong>训练和测试数据准备</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Data preparation</span><br><span class="line">local/prepare_data.sh waves_yesno</span><br></pre></td></tr></table></figure>
+<p>执行上面的命令行后，会得到两个数据集，data/train_yesno 和 data/test_yesno,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">train_yesno/</span><br><span class="line">├── spk2utt</span><br><span class="line">├── text</span><br><span class="line">├── utt2dur</span><br><span class="line">├── utt2spk</span><br><span class="line">└── wav.scp</span><br><span class="line"></span><br><span class="line">dev_yesno/</span><br><span class="line">├── spk2utt</span><br><span class="line">├── text</span><br><span class="line">├── utt2dur</span><br><span class="line">├── utt2spk</span><br><span class="line">└── wav.scp</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>人工准备资源</strong></p>
+<p>在 input 下面需要一些人工准备的资源，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">input/</span><br><span class="line">├── lexicon_nosil.txt</span><br><span class="line">├── lexicon.txt</span><br><span class="line">├── phones.txt</span><br><span class="line">└── task.arpabo</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>lexicon.txt</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">YES Y</span><br><span class="line">NO N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>lexicon_nosil.txt</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;SIL&gt; SIL</span><br><span class="line">YES Y</span><br><span class="line">NO N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>phones.txt</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SIL</span><br><span class="line">Y</span><br><span class="line">N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>task.arpabo</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">\data\</span><br><span class="line">ngram 1=4</span><br><span class="line"></span><br><span class="line">\1-grams:</span><br><span class="line">-1      NO</span><br><span class="line">-1      YES</span><br><span class="line">-99 &lt;s&gt;</span><br><span class="line">-1 &lt;/s&gt;</span><br><span class="line"></span><br><span class="line">\end\</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><strong>准备语言文件夹</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">local</span>/prepare_dict.sh</span><br><span class="line">utils/prepare_lang.sh --position-dependent-phones <span class="literal">false</span> data/<span class="built_in">local</span>/dict <span class="string">&quot;&lt;SIL&gt;&quot;</span> data/<span class="built_in">local</span>/lang data/lang</span><br><span class="line"><span class="built_in">local</span>/prepare_lm.sh</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;finished &quot;</span></span><br></pre></td></tr></table></figure>
+<p>前两行准备 data/lang （语言文件夹）。第三行脚本准备 lm，将 arpa 格式的 LM 转换成 WFST 的格式。</p>
+</li>
+</ol>
+<h4 id="2-3-4-提取声学特征"><a href="#2-3-4-提取声学特征" class="headerlink" title="2.3.4 提取声学特征"></a>2.3.4 提取声学特征</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Feature extraction</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> train_yesno test_yesno; <span class="keyword">do</span> </span><br><span class="line"> steps/make_mfcc.sh --nj 1 data/<span class="variable">$x</span> exp/make_mfcc/<span class="variable">$x</span> mfcc</span><br><span class="line"> steps/compute_cmvn_stats.sh data/<span class="variable">$x</span> exp/make_mfcc/<span class="variable">$x</span> mfcc</span><br><span class="line"> utils/fix_data_dir.sh data/<span class="variable">$x</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>执行了如上脚本之后，可以到 data/train_yesno 以及 data/dev_yesno 两个数据集对应的 feats.scp 文件，其中 data/train_yesno/feats.scp 文件如下，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0_0_0_0_1_1_1_1 /mnt/users/daijun_chen/gits/github/kaldi/egs/yesno/s5/mfcc/raw_mfcc_train_yesno.1.ark:16</span><br><span class="line">0_0_0_1_0_0_0_1 /mnt/users/daijun_chen/gits/github/kaldi/egs/yesno/s5/mfcc/raw_mfcc_train_yesno.1.ark:8386</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-5-声学模型的训练"><a href="#2-3-5-声学模型的训练" class="headerlink" title="2.3.5 声学模型的训练"></a>2.3.5 声学模型的训练</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Mono training</span></span><br><span class="line">steps/train_mono.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$train_cmd</span>&quot;</span> \</span><br><span class="line">  --totgauss 400 \</span><br><span class="line">  data/train_yesno data/lang exp/mono0a </span><br></pre></td></tr></table></figure>
+<h4 id="2-3-6-构建状态图-HCLG"><a href="#2-3-6-构建状态图-HCLG" class="headerlink" title="2.3.6 构建状态图 HCLG"></a>2.3.6 构建状态图 HCLG</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Graph compilation  </span></span><br><span class="line">utils/mkgraph.sh data/lang_test_tg exp/mono0a exp/mono0a/graph_tgpr</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-7-使用解码器进行解码"><a href="#2-3-7-使用解码器进行解码" class="headerlink" title="2.3.7 使用解码器进行解码"></a>2.3.7 使用解码器进行解码</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Decoding</span></span><br><span class="line">steps/decode.sh --nj 1 --cmd <span class="string">&quot;<span class="variable">$decode_cmd</span>&quot;</span> \</span><br><span class="line">    exp/mono0a/graph_tgpr data/test_yesno exp/mono0a/decode_test_yesno</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> exp/*/decode*; <span class="keyword">do</span> [ -d <span class="variable">$x</span> ] &amp;&amp; grep WER <span class="variable">$x</span>/wer_*; <span class="keyword">done</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> exp/*/decode*; <span class="keyword">do</span> [ -d <span class="variable">$x</span> ] &amp;&amp; grep WER <span class="variable">$x</span>/wer_* | utils/best_wer.sh; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>输出的声学模型在路径 exp/mono0a 下面，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">mono0a/</span><br><span class="line">├── 0.mdl</span><br><span class="line">├── 40.mdl</span><br><span class="line">├── 40.occs</span><br><span class="line">├── ali.1.gz</span><br><span class="line">├── cmvn_opts</span><br><span class="line">├── decode_test_yesno</span><br><span class="line">│   ├── lat.1.gz</span><br><span class="line">│   ├── log</span><br><span class="line">│   ├── num_jobs</span><br><span class="line">│   ├── scoring_kaldi</span><br><span class="line">│   │   ├── best_wer</span><br><span class="line">│   │   ├── log</span><br><span class="line">│   │   ├── penalty_0.0</span><br><span class="line">│   │   │   ├── *.txt</span><br><span class="line">│   │   │   └── log</span><br><span class="line">│   │   ├── penalty_0.5</span><br><span class="line">│   │   │   ├── *.txt</span><br><span class="line">│   │   │   └── log</span><br><span class="line">│   │   ├── penalty_1.0</span><br><span class="line">│   │   │   ├── *.txt</span><br><span class="line">│   │   │   └── log</span><br><span class="line">│   │   ├── test_filt.txt</span><br><span class="line">│   │   └── wer_details</span><br><span class="line">│   │       ├── lmwt</span><br><span class="line">│   │       ├── ops</span><br><span class="line">│   │       ├── per_spk</span><br><span class="line">│   │       ├── per_utt</span><br><span class="line">│   │       ├── wer_bootci</span><br><span class="line">│   │       └── wip</span><br><span class="line">│   ├── wer_10_*.*</span><br><span class="line">├── final.mdl -&gt; 40.mdl</span><br><span class="line">├── final.occs -&gt; 40.occs</span><br><span class="line">├── fsts.1.gz</span><br><span class="line">├── graph_tgpr</span><br><span class="line">│   ├── disambig_tid.int</span><br><span class="line">│   ├── HCLG.fst</span><br><span class="line">│   ├── num_pdfs</span><br><span class="line">│   ├── phones</span><br><span class="line">│   │   ├── align_lexicon.int</span><br><span class="line">│   │   ├── align_lexicon.txt</span><br><span class="line">│   │   ├── disambig.int</span><br><span class="line">│   │   ├── disambig.txt</span><br><span class="line">│   │   ├── optional_silence.csl</span><br><span class="line">│   │   ├── optional_silence.int</span><br><span class="line">│   │   ├── optional_silence.txt</span><br><span class="line">│   │   └── silence.csl</span><br><span class="line">│   ├── phones.txt</span><br><span class="line">│   └── words.txt</span><br><span class="line">├── log</span><br><span class="line">├── num_jobs</span><br><span class="line">├── phones.txt</span><br><span class="line">└── tree</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-8-识别结果样例"><a href="#2-3-8-识别结果样例" class="headerlink" title="2.3.8 识别结果样例"></a>2.3.8 识别结果样例</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1_0_0_0_0_0_0_0 YES NO NO NO NO NO NO NO</span><br><span class="line">1_0_0_0_0_0_0_1 YES NO NO NO NO NO NO YES</span><br><span class="line">1_0_0_0_0_0_1_1 YES NO NO NO NO NO YES YES</span><br><span class="line">1_0_0_0_1_0_0_1 YES NO NO NO YES NO NO YES</span><br><span class="line">1_0_0_1_0_1_1_1 YES NO NO YES NO YES YES YES</span><br><span class="line">1_0_1_0_1_0_0_1 YES NO YES NO YES NO NO YES</span><br><span class="line">1_0_1_1_0_1_1_1 YES NO YES YES NO YES YES YES</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag">语音识别</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+    
+</article>
+
+    
+    <article
   id="post-paper-0.0.3/chapters/kaldi tutorial"
   class="article article-type-post"
   itemscope
@@ -346,37 +486,37 @@
   <p><h1 style="text-align: center"> 序列区分性训练 </h1></p>
 <div style="text-align: center"><small>陈代君 - 2021</small></div>
 
-
-
-<p>摘要： </p>
-<h2 id="1-生成式模型的缺陷"><a href="#1-生成式模型的缺陷" class="headerlink" title="1. 生成式模型的缺陷"></a>1. 生成式模型的缺陷</h2><p>​    语音识别的本质可以用下面的公式进行描述，</p>
+<p><strong>摘要</strong>：前面的章节介绍了基于极小化交叉熵 (CE) 准则的声学模型训练。本章在此基础上介绍基于极大化互信息准则的声学模型序列区分性训练，包括极大互信息准则引入的动机和优化算法。同时介绍了在实现过程中，使用的基于词格和不基于词格的两种策略。进一步，本章还介绍了一些其他序列区分性准则，同时给出了优化算法及其推导过程。最后，介绍了 Kaldi 中序列区分性准则的示例，帮助读者更好的理解序列区分性准则。</p>
+<h2 id="1-生成式模型的缺陷"><a href="#1-生成式模型的缺陷" class="headerlink" title="1. 生成式模型的缺陷"></a>1. 生成式模型的缺陷</h2><p>语音识别的本质可以用下面的公式进行描述，</p>
 <script type="math/tex; mode=display">
-\max_{W}\mathbb{P}(W|O)</script><p>其中 <script type="math/tex">O={O_1,\cdots,O_T}</script> 表示观测到的语音信号序列，<script type="math/tex">W=W_1,\cdots,W_N</script> 表示词序列。传统的语音识别进一步分解上面的公式，</p>
+\begin{align}
+\max_{W}\mathbb{P}(W|O) \label{sec1_basic}
+\end{align}</script><p>其中 <script type="math/tex">O={O_1,\cdots,O_T}</script> 表示观测到的语音信号序列，<script type="math/tex">W=W_1,\cdots,W_N</script> 表示词序列。传统的语音识别进一步分解上面的公式 $(\ref{sec1_basic})$，</p>
 <script type="math/tex; mode=display">
-\max_{W} \mathbb{P}(W|O) = \max_{W}\frac{\mathbb{P}_{\theta}(O|W)\mathbb{P}(W)}{\mathbb{P}(O)}</script><p>其中，在声音信号给定后，分母上 <script type="math/tex">\mathbb{P}(O)</script> 是不需要考虑的常量；分子上 <script type="math/tex">\mathbb{P}(W)</script> 表示语言模型， <script type="math/tex">\mathbb{P}_{\theta}(O|W)</script> 表示声学模型。 声学模型的参数 $\theta$ 通常基于训练集 <script type="math/tex">\{( W^{m}, O^{m})\}_{m=1}^{M}</script> 进行估计，例如极大似然估计。 </p>
-<p>为了能够理解极大似然估计的缺陷，先回顾一下极大似然估计。统计的频率学派将参数 <script type="math/tex">\theta</script> 视为未知常量，在模型类型给定的基础上，基于训练数据在参数空间中寻找使得似然最大的 <script type="math/tex">\theta</script>，记为 <script type="math/tex">\hat{\theta}_{MLE}</script>， 这个值就是 <script type="math/tex">\theta</script> 的极大似然估计。求极大似然估计的过程中，需要给定模型类型，例如在语音识别中，通常假定模型为 GMM-HMM 或者 DNN-HMM。因为真实的语音信号并不是由 HMM 生成的，所以在 GMM-HMM 模型假设的基础上根据似然最大准则找到的最优参数并不一定使得 WER 或者 SER 最小。换句话说，似然极大准则并不能保证语音识别的错误率最小。</p>
-<p>实际上，<script type="math/tex">\mathbb{P}_{\theta}(O|W)</script> 是描述数据分布的生成式模型 (generative model)，即给定词序列，假设观测到的语音信号服从 GMM-HMM 或者 DNN-HMM 模型描述的分布。不同于生成式模型，区分性模型 (discriminative model，也称为判别式模型) 直接对给定观测数据条件下真实类别的分布进行建模，即对 <script type="math/tex">\mathbb{P}_{\theta}(W|O)</script> 进行建模。</p>
+\max_{W} \mathbb{P}(W|O) = \max_{W}\frac{\mathbb{P}(O|W,\theta)\mathbb{P}(W)}{\mathbb{P}(O)} \label{sec1_basic_decomp}</script><p>其中，分母上的 <script type="math/tex">\mathbb{P}(O)</script> 在声音信号给定后是不需要考虑的常量；分子上的 <script type="math/tex">\mathbb{P}(W)</script> 表示语言模型， <script type="math/tex">\mathbb{P}(O|W,\theta)</script> 表示声学模型。 声学模型的参数 $\theta$ 通常基于训练集 <script type="math/tex">\{( W^{m}, O^{m})\}_{m=1}^{M}</script> 进行估计，例如极大似然估计。 </p>
+<p>为了能够理解极大似然估计的缺陷，先回顾一下极大似然估计。统计的频率学派将参数 <script type="math/tex">\theta</script> 视为未知常量，在模型类型给定的基础上，基于训练数据在参数空间中寻找使得似然函数最大的 <script type="math/tex">\theta</script>，记为 <script type="math/tex">\hat{\theta}_{MLE}</script>， 这个值就是 <script type="math/tex">\theta</script> 的极大似然估计。求极大似然估计的过程中，需要给定模型类型，例如在语音识别中，通常假定模型为 GMM-HMM 或者 DNN-HMM。因为真实的语音信号并不是由 HMM 生成的，所以在 GMM-HMM 模型假设的基础上根据似然最大准则找到的最优参数并不一定使得 WER 或者 SER 最小。换句话说，似然极大并不能保证语音识别的错误率最小。</p>
+<p>实际上，<script type="math/tex">\mathbb{P}(O|W,\theta)</script> 是描述数据分布的生成式模型 (generative model)，即给定词序列，假设观测到的语音信号服从 GMM-HMM 或者 DNN-HMM 模型描述的分布。不同于生成式模型，区分性模型 (discriminative model，也称为判别式模型) 直接对给定观测数据条件下真实类别的分布进行建模，即对 <script type="math/tex">\mathbb{P}(W|O,\theta)</script> 进行建模。</p>
 <h2 id="2-MMI-估计"><a href="#2-MMI-估计" class="headerlink" title="2. MMI 估计"></a>2. MMI 估计</h2><h3 id="2-1-MMI-估计的基本原理"><a href="#2-1-MMI-估计的基本原理" class="headerlink" title="2.1 MMI 估计的基本原理"></a>2.1 MMI 估计的基本原理</h3><p>因为语音信号随机变量 <script type="math/tex">\mathbf{O}</script> 和词序列随机变量 <script type="math/tex">\mathbf{W}</script> 的互信息如下，</p>
 <script type="math/tex; mode=display">
 \begin{align}\mathbb{I}(\mathbf{O}, \mathbf{W}) &= \mathbb{E}\log\frac{\mathbb{P}(\mathbf{O},\mathbf{W})}{\mathbb{P}(\mathbf{O})\mathbb{P}(\mathbf{W})}\\
 &=\mathbb{H}(\mathbf{W})-\mathbb{H}(\mathbf{W}|\mathbf{O})\end{align}</script><p>其中， <script type="math/tex">\mathbb{H}(\mathbf{W})</script> 表示词序列随机变量的熵，<script type="math/tex">\mathbb{H}(\mathbf{W}|\mathbf{O})</script> 表示条件为语音信号随机变量的条件熵。</p>
-<p>因为 <script type="math/tex">\mathbb{H}(\mathbf{W})</script> 与待估计模型的参数无关，所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{W})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{W}|\mathbf{O})</script>。极小化条件熵意味着语音信号随机变量 <script type="math/tex">\mathbf{O}</script> 给定条件下，极小化词序列随机变量 <script type="math/tex">\mathbf{W}</script> 的不确定性。 又因为下面的互信息表达式中，<script type="math/tex">\mathbb{P}(\mathbf{W})</script> 不含声学模型待估参数，故极大化互信息等价于极大化下式右边第一项。</p>
+<p>因为 <script type="math/tex">\mathbb{H}(\mathbf{W})</script> 与待估计模型的参数无关，所以极大化互信息 <script type="math/tex">\mathbb{I}(\mathbf{O}, \mathbf{W})</script> 等价于极小化条件熵 <script type="math/tex">\mathbb{H}(\mathbf{W}|\mathbf{O})</script>。极小化条件熵意味着语音信号随机变量 <script type="math/tex">\mathbf{O}</script> 给定条件下，极小化词序列随机变量 <script type="math/tex">\mathbf{W}</script> 的不确定性。 又因为下面的互信息表达式 $(\ref{sec2_mi})$ 中，<script type="math/tex">\mathbb{P}(\mathbf{W})</script> 不含声学模型待估参数，故极大化互信息等价于极大化 $(\ref{sec2_mi})$ 右边的第一项。</p>
 <script type="math/tex; mode=display">
-\mathbb{I}(\mathbf{O},\mathbf{W}) = \mathbb{E}\log\frac{\mathbb{P}(\mathbf{O},\mathbf{W})}{\mathbb{P}(\mathbf{O})} - \mathbb{E}\log\mathbb{P}(\mathbf{W})</script><p>基于训练集 <script type="math/tex">\mathbb{S}=\{( W^{m}, O^{m})\}_{m=1}^{M}</script> ，可以训练极大似然声学模型 (GMM-HMM, 或 DNN-HMM) 。利用极大似然声学模型对训练集进行状态级别的对齐后，可以得到对齐后的训练集 $\mathbb{S}^{aligned}=\{(W^m,O^m,S^m)\}_{m=1}^{M}$，其中 $W^{m}=W^m_1,\cdots,W^m_{N_m}, O^m=O^m_1,\cdots,O^m_{T_m}, S^m=S^m_1,\cdots,S^m_{T_m}$。极大互信息 (MMI, maximum mutual information) 准则公式如下，</p>
+\mathbb{I}(\mathbf{O},\mathbf{W}) = \mathbb{E}\log\frac{\mathbb{P}(\mathbf{O},\mathbf{W})}{\mathbb{P}(\mathbf{O})} - \mathbb{E}\log\mathbb{P}(\mathbf{W}) \label{sec2_mi}</script><p>基于训练集 <script type="math/tex">\mathbb{S}=\{( W^{m}, O^{m})\}_{m=1}^{M}</script> ，可以训练极大似然声学模型 (GMM-HMM, 或 DNN-HMM) 。利用极大似然声学模型对训练集进行状态级别的对齐后，可以得到对齐后的训练集 $\mathbb{S}^{aligned}=\{(W^m,O^m,S^m)\}_{m=1}^{M}$，其中 $W^{m}=W^m_1,\cdots,W^m_{N_m}, O^m=O^m_1,\cdots,O^m_{T_m}, S^m=S^m_1,\cdots,S^m_{T_m}$。极大互信息 (MMI, maximum mutual information) 准则公式如下，</p>
 <script type="math/tex; mode=display">
 \begin{align}
-J_{MMI}(\mathbb{S}|\theta) &= \sum_{m=1}^{M}J_{MMI}(W^m,O^m|\theta)\\
-&=\sum_{m=1}^{M}\log\mathbb{P}_{\theta}(W^{m}|O^m,\theta)\\
-&=\sum_{m=1}^{M}\log\frac{\mathbb{P}_{\theta}(O^m|W^m,\theta)\mathbb{P}(W^m)}{\sum_{W}\mathbb{P}_{\theta}(O^m|W,\theta)\mathbb{P}(W)}\\
-&=\sum_{m=1}^{M}\log\frac{\mathbb{P}_{\theta}(O^m|S^m,\theta)\mathbb{P}(W^m)}{\sum_{W}\mathbb{P}_{\theta}(O^m|S,\theta)\mathbb{P}(W)}
+J_{MMI}(\mathbb{S}|\theta) &= \sum_{m=1}^{M}J_{MMI}(W^m,O^m|\theta) \label{mmi_obj}\\
+&=\sum_{m=1}^{M}\log\mathbb{P}(W^{m}|O^m,\theta)\\
+&=\sum_{m=1}^{M}\log\frac{\mathbb{P}(O^m|W^m,\theta)\mathbb{P}(W^m)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)}\\
+&=\sum_{m=1}^{M}\log\frac{\mathbb{P}(O^m|S^m,\theta)\mathbb{P}(W^m)}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}
 \end{align}</script><p>其中，分母上的 <script type="math/tex">W</script> 表示给定语音信号 <script type="math/tex">O^{m}</script> 条件下可能的词序列。例如，当正确的词序列为 “动手学语音识别”， “冻手雪余音识别” 可以作为一个可能的词序列。</p>
 <p>为了极大化 MMI 的目标函数，可以增加分子或者减小分母 （MMI 的目标函数可以转化为似然函数乘积的形式）。 增加分子意味着提高给定正确词序列条件下观测语音信号的概率，即声学模型的概率。减小分母等同于减少错误词序列条件下观测语音的概率。综合起来看，增加正确词序列的概率和减少错误词序列的概率使得最终的 MMI 估计具有更好的区分性，最终经过区分性训练后的声学模型能够更好地识别出正确的词序列。</p>
-<h3 id="2-2-MMI-训练算法推导"><a href="#2-2-MMI-训练算法推导" class="headerlink" title="2.2 MMI 训练算法推导"></a>2.2 MMI 训练算法推导</h3><h4 id="2-2-1-GMM-HMM"><a href="#2-2-1-GMM-HMM" class="headerlink" title="2.2.1 GMM-HMM"></a>2.2.1 GMM-HMM</h4><p>​    理解了 MMI 的基本原理之后，还需要能够快速寻找 MMI 目标函数的优化算法。 相对于极大似然目标函数的优化来说， MMI 的目标函数的优化是更难的。总的来说，有两类算法被用来优化 MMI 的目标函数。第一类是基于梯度的优化算法，例如 GPD (Generalized Probabilistic Descent)。 第二类是更接近 EM 算法的 EB (Extended Baum-Welch) 算法。相对于基于梯度的优化算法，EB 算法具有下面的优势。</p>
+<h3 id="2-2-MMI-训练算法推导"><a href="#2-2-MMI-训练算法推导" class="headerlink" title="2.2 MMI 训练算法推导"></a>2.2 MMI 训练算法推导</h3><h4 id="2-2-1-GMM-HMM"><a href="#2-2-1-GMM-HMM" class="headerlink" title="2.2.1 GMM-HMM"></a>2.2.1 GMM-HMM</h4><p>理解了 MMI 的基本原理之后，还需要能够快速寻找 MMI 目标函数的优化算法。 相对于极大似然目标函数的优化来说， MMI 的目标函数的优化是更难的。总的来说，有两类算法被用来优化 MMI 的目标函数。第一类是基于梯度的优化算法，例如 GPD (Generalized Probabilistic Descent)。 第二类是更接近 EM 算法的 EB (Extended Baum-Welch) 算法。相对于基于梯度的优化算法，EB 算法具有下面的优势。</p>
 <ul>
 <li>EB 算法利用辅助函数从理论上确保了算法的收敛和高效。</li>
 <li>EB 算法可以处理 HMM 中每个状态到其他状态的转移概率求和等于 1 以及 GMM 各分量权重求和等于 1 这两个等式约束条件。 </li>
 </ul>
-<p>​    下面是 GMM-HMM 模型的 EB 算法第 <script type="math/tex">k+1</script> 步的迭代公式， 证明的细节参考附录。</p>
+<p>下面是 GMM-HMM 模型的 EB 算法第 <script type="math/tex">k+1</script> 步的迭代公式， 证明的细节参考附录。</p>
 <script type="math/tex; mode=display">
 \begin{align}
 \mu_{jm}^{(k+1)} &= \frac{\theta^{num}_{jm}(\mathbf{O})-\theta_{jm}^{den}(\mathbf{O})+D_{jm}\cdot\mu_{jm}^{(k)}}{\gamma_{jm}^{num}-\gamma_{jm}^{den}+D_{jm}} \\
@@ -396,10 +536,25 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 \theta_{jm}^{den}(\mathbf{O}) = \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{den}(t)O_i(t)\\
 \theta_{jm}^{num}(\mathbf{O}^2) &= \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{num}(t)O_i^2(t), 
 \theta_{jm}^{den}(\mathbf{O}^2) = \sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\gamma_{ijm}^{den}(t)O^2_{i}(t)
-\end{align}</script><p>上面的参数更新公式中，<script type="math/tex">\gamma_{ijm}^{den}(t)</script> 的计算需要遍历所有可能的词序列。因为所有可能的词序列数量巨大，所以直接通过上面的更新公式来求解参数的 MMI 估计几乎是不可能的。 为了克服这个计算上的困难，下面两个小节将介绍两种解决方法。</p>
-<h4 id="2-2-2-DNN-HMM"><a href="#2-2-2-DNN-HMM" class="headerlink" title="2.2.2 DNN-HMM"></a>2.2.2 DNN-HMM</h4><p>不同于传统的 GMM-HMM，DNN-HMM 的区分性训练算法主要采用了基于随机梯度下降的算法。</p>
-<h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><p>​    为了加速 MMI 的计算量，早期的工作主要集中在使用 N-best 列表来近似 MMI 分母中所有可能词序列的集合。但是对于非常长的词序列，LM 计算出来的概率都接近于零，导致 N-best 中存储的备选词序列不能很好地近似分母所需的词序列集合 [Chow, 1990] 。另一种逼近 MMI 分母词序列的方案中，对每一个训练词序列生成一个 Lattice（词格），该 Lattice 将会被应用到 MMI 训练且在迭代过程不会被更新 [Povey, 2003]。</p>
-<p>​    Lattice-based MMI 的具体实现步骤如下，</p>
+\end{align}</script><p>上面的参数更新公式中，<script type="math/tex">\gamma_{ijm}^{den}(t)</script> 的计算需要遍历所有可能的词序列。因l为所有可能的词序列数量巨大，所以直接通过上面的更新公式来求解参数的 MMI 估计几乎是不可能的。 为了克服这个计算上的困难，下面两个小节将介绍两种解决方法。</p>
+<h4 id="2-2-2-DNN-HMM"><a href="#2-2-2-DNN-HMM" class="headerlink" title="2.2.2 DNN-HMM"></a>2.2.2 DNN-HMM</h4><p>不同于传统的 GMM-HMM，DNN-HMM 的区分性训练主要采用了基于随机梯度下降的优化算法。假设 $y_{mt}^L=softmax(z^L_{mt})$ 是 DNN 的输出，则 MMI 的目标函数关于模型参数 $\theta$ 的梯度可以通过如下公式计算，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\grad_{\theta}J_{MMI}(\mathbb{S}|\theta)=\sum_{m=1}^{M}\sum_{t=1}^{T_{m}}\grad_{z_{mt}^L}J_{MMI}(W^m,O^m|\theta)\frac{\part{z_{mt}^{L}}}{\part{\theta}} \label{sec2_dnn-hmm_grad}
+\end{align}</script><p>上面计算梯度的公式 $(\ref{sec2_dnn-hmm_grad})$ 中，$\frac{\part{z_{mt}^{L}}}{\part{\theta}}$ 只跟DNN的网络结构相关，和目标函数无关，所以仅关心目标函数关于 $z_{mt}^{L}$ 的梯度计算。为了方便，记 $e^{L}_{mt}=(e^{L}_{mt}(1),\dots, e^{L}_{mt}(n_L))^T$，其中 $e_{mt}^{L}(i)=\grad_{z_{mt}^{L}(i)}J_{MMI}(W^{m},O^{m}|\theta)$  且 $n_L$ 表示 DNN 输出层 (第 L 层) 的节点个数。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+e^L_{mt}(i) &= \sum_{r}\frac{\part{J_{MMI}}(W^m,O^m|\theta)}{\part\log \mathbb{P}(O^m_t|S^m_t=r)}\frac{\part \log \mathbb{P}(O_{t}^m|S_t^m=r)}{\part z^L_{mt}(i)}  \\
+&= \sum_r \Big(\mathbb{1}(S_t^m=r)-\frac{\sum_{W\in\{W|S_t=r\}}P(O^m|S,\theta)P(W)}{\sum_{W}\log P(O^m|S,\theta)P(W)}\Big)\frac{\part\log P(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)}                \\ 
+&=\sum_{r}\Big(\mathbb{1}(S_t^m=r)-\gamma_{mt}^{den}(r)\Big)\frac{\part\log y_{mt}^L(r)}{\part z_{mt}^{L}(i)} \\ 
+&= \mathbb{1}(S_t^m=i) - \gamma_{mt}^{den}(i)
+\end{align}</script><p>其中，$\mathbb{1}(\cdot)$ 表示示性函数，如果自变量内条件成立，取值为 1，否则为 0；</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\gamma_{mt}^{den}(r)=\frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}
+\end{align}</script><p>证明见附录 <a href="#mmi_grad_der">7.2</a>。</p>
+<h3 id="2-3-Lattice-based-MMI"><a href="#2-3-Lattice-based-MMI" class="headerlink" title="2.3 Lattice-based MMI"></a>2.3 Lattice-based MMI</h3><p>为了加速 MMI 的计算量，早期的工作主要集中在使用 N-best 列表来近似 MMI 分母中所有可能词序列的集合。但是对于非常长的词序列，LM 计算出来的概率都接近于零，导致 N-best 中存储的备选词序列不能很好地近似分母所需的词序列集合 [Chow, 1990] 。另一种逼近 MMI 分母词序列的方案中，对每一个训练词序列生成一个 Lattice（词格），该 Lattice 将会被应用到 MMI 训练且在迭代过程不会被更新 [Povey, 2003]。</p>
+<p>Lattice-based MMI 的具体实现步骤如下，</p>
 <hr>
 <p><strong>实现步骤</strong></p>
 <ol>
@@ -413,8 +568,8 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 </li>
 </ol>
 <hr>
-<p>​    上面的实现步骤中，利用两个不同的模型分别对分子和分母部分构建分子 Lattice 以及分母 Lattice。其中分母 Lattice 的构造， 利用了由简单的 unigram 语言模型组成的 HCLG 有限状态转移图。在 MMI 的迭代更新过程中，分母和分子部分的计算都利用了 unigram 语言模型计算路径的概率。</p>
-<p>​    下面的表格总结了 [Povey, 2003] 中报告的 Lattice-based MMI 训练过程中的各方面影响，</p>
+<p>上面的实现步骤中，利用两个不同的模型分别对分子和分母部分构建分子 Lattice 以及分母 Lattice。其中分母 Lattice 的构造， 利用了由简单的 unigram 语言模型组成的 HCLG 有限状态转移图。在 MMI 的迭代更新过程中，分母和分子部分的计算都利用了 unigram 语言模型计算路径的概率。</p>
+<p> 下面的表格总结了 [Povey, 2003] 中报告的 Lattice-based MMI 训练过程中的各方面影响，</p>
 <div class="table-container">
 <table>
 <thead>
@@ -443,30 +598,184 @@ f^{den}(\theta) &= \sum_{i=1}^{N}\log\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)\math
 </tbody>
 </table>
 </div>
-<h3 id="2-4-Lattice-free-MMI"><a href="#2-4-Lattice-free-MMI" class="headerlink" title="2.4 Lattice-free MMI"></a>2.4 Lattice-free MMI</h3><h2 id="3-区分性准则"><a href="#3-区分性准则" class="headerlink" title="3. 区分性准则"></a>3. 区分性准则</h2><h3 id="3-1-区分性准则的统一公式"><a href="#3-1-区分性准则的统一公式" class="headerlink" title="3.1 区分性准则的统一公式"></a>3.1 区分性准则的统一公式</h3><h3 id="3-2-scaled-MMI"><a href="#3-2-scaled-MMI" class="headerlink" title="3.2 scaled MMI"></a>3.2 scaled MMI</h3><p>在 MMI 的目标函数中，分子和分母部分的词序列概率通常采用简单的 unigram 语言模型来近似，因为 unigram 模型忽略了词与词之间的相关性，所以导致备选词序列集合中概率高的词序列数量较少。最终导致 MMI 的目标函数不需要怎么调整声学模型参数就可以达到较大值， 但是却没有提高声学模型对于混淆路径的区分度。为了解决混淆路径较少的问题，引入如下的 scaled MMI 目标函数，</p>
+<h3 id="2-4-Lattice-free-MMI"><a href="#2-4-Lattice-free-MMI" class="headerlink" title="2.4 Lattice-free MMI"></a>2.4 Lattice-free MMI</h3><h2 id="3-区分性准则"><a href="#3-区分性准则" class="headerlink" title="3. 区分性准则"></a>3. 区分性准则</h2><h3 id="3-1-区分性准则的统一形式"><a href="#3-1-区分性准则的统一形式" class="headerlink" title="3.1 区分性准则的统一形式"></a>3.1 区分性准则的统一形式</h3><p>除 MMI 目标函数 $(\ref{mmi_obj})$ 之外，区分性训练还可以使用许多其他的目标函数。实际上，这些区分性训练所使用的目标函数都基本符合如下的统一形式 $(\ref{seq_uniform_den_num})$。</p>
 <script type="math/tex; mode=display">
-\sum_{i=1}^N\log\frac{\mathbb{P}_{\theta}(O_{i}|S_i)^{\alpha}\mathbb{P}(S_i)^{\alpha}}{\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)^{\alpha}\mathbb{P}(S_i^j)^{\alpha}}</script><p>其中 <script type="math/tex">\alpha</script> 被称为尺度因子 (scale factor)，<script type="math/tex">0<\alpha<1</script>。</p>
-<p>加入尺度因子之后，能够缩小备选词序列集合中词序列之间的概率差异，从而增加混淆路径的数量。使得最大化 scaled MMI 目标函数能够得到更具有区分性的声学模型 <script type="math/tex">\mathbb{P}_{\theta}(O_i|W_i)</script>。</p>
+\begin{align}
+J_{seq\_uniform}(\mathbb{S}|\theta) &= \sum_{m=1}^M J_{seq\_uniform}(W^m,O^m|\theta)\\
+&=\sum_{m=1}^M\frac{J^{num}_{seq\_uniform}(W^m,O^m|\theta)}{J_{seq\_uniform}^{den}(W^m,O^m|\theta)}  \label{seq_uniform_den_num}
+\end{align}</script><p>统一形式 $(\ref{seq_uniform_den_num})$ 关于给定样本 $(W^m,O^m)$ 由分子和分母两部分组成。其分子上的 $J^{num}_{seq_uniform}(\cdot)$ 通常由表示正确词序列 $W^m$ 的词格计算；分母上的 $J_{seq_uniform}^{den}(\cdot)$ 通常由表示备选词序列 $W$ 的词格计算。目标函数 $J_{seq_uniform}(\mathbb{S}|\theta)$ 关于 $\theta$ 的梯度如下，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\grad_{\theta}J_{seq\_uniform}(\mathbb{S}|\theta)=\sum_{m=1}^{M}\sum_{t=1}^{T_{m}}\grad_{z_{mt}^L}J_{seq\_uniform}(W^m,O^m|\theta)\frac{\part{z_{mt}^{L}}}{\part{\theta}}
+\end{align}</script><p>其中 $\frac{\part z_{mt}^L}{\part \theta}$ 和目标函数无关，只和使用的 DNN 网络结构相关。因此只需要考虑</p>
+<script type="math/tex; mode=display">
+\begin{align}
+e_{mt}^L(i)&=\grad_{z_{mt}^L(i)}J_{seq\_uniform}(W^m,O^m|\theta) \\
+&=\sum_{r}\frac{\part J_{seq\_uniform}(W^m,O^m|\theta)}{\part\log\mathbb{P}(O_{t}^m|S_t^m=r)}\frac{\part \log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)} \\
+&=\sum_r\big(\gamma^{num}_{mt}(r)-\gamma^{den}_{mt}(r)\big)\times\Big(\frac{\part\big(\log\mathbb{P}(S_t^m=r|O_t^m)-\log\mathbb{P}(S_t^m=r)+\log\mathbb{P}(O_t^m)\big)}{\part z_{mt}^L(i)}\Big) \\
+&=\sum_r\big(\gamma_{mt}^{num}(r)-\gamma_{mt}^{den}(r)\big)\times\frac{\part\log\mathbb{P}(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)} \\
+&= \sum_r\big(\gamma_{mt}^{num}(r)-\gamma_{mt}^{den}(r)\big)\frac{1}{\mathbb{P}(S_t^m=r|O_t^m)}\frac{\part\mathbb{P}(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)}\\
+&=\sum_r\big(\gamma_{mt}^{num}(r)-\gamma_{mt}^{den}(r)\big)\big(\delta_{ir}-\mathbb{P}(S_t^m=i|O_t^m)\big) \\
+&=\gamma_{mt}^{num}(i)-\gamma_{mt}^{den}(i)
+\end{align}</script><p>不同目标函数梯度的区别主要出现在 $\gamma_{mt}^{num}(i)$ 以及 $\gamma_{mt}^{den}(i)$ 的计算上。接下来将统一的公式应用到不同的目标函数，同时给出对应的梯度。</p>
+<h3 id="3-2-scaled-MMI"><a href="#3-2-scaled-MMI" class="headerlink" title="3.2 scaled MMI"></a>3.2 scaled MMI</h3><p>在 MMI 的目标函数中，分子和分母部分的词序列概率通常采用简单的 unigram 语言模型来近似，因为 unigram 模型忽略了词与词之间的相关性，所以导致备选词序列集合中概率高的词序列数量较少。最终导致 MMI 的目标函数不需要怎么调整声学模型参数就可以达到较大值， 但是却没有提高声学模型对于混淆路径的区分能力。为了解决混淆路径较少的问题，引入如下的 scaled MMI 目标函数，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+J_{scaled\_MMI}(\mathbb{S}|\theta) &= \sum_{m=1}^MJ_{scaled\_MMI}(W^m,O^m|\theta) \\
+&= \sum_{m=1}^M\log\frac{\mathbb{P}(O^{m}|W^m,\theta)\mathbb{P}(W^m)^{\alpha}}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}} \\
+&= \sum_{m=1}^M\log\frac{\mathbb{P}(O^m|S^m,\theta)\mathbb{P}(W^m)^{\alpha}}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}} \label{sec_scaled_mmi_obj}
+\end{align}</script><p>其中 <script type="math/tex">\alpha</script> 被称为尺度因子 (scale factor)，<script type="math/tex">0<\alpha<1</script>。</p>
+<p>加入尺度因子之后，能够缩小备选词序列集合中词序列语言模型概率之间的差异，从而增加混淆路径的数量。使得最大化 scaled MMI 目标函数能够得到更具区分性的声学模型 <script type="math/tex">\mathbb{P}(O^m|W^m,\theta)</script>。</p>
 <p><p align = "center"><br>    <img height="400px" src = "./images/scaleFactor.png"><br>    图 3-1 尺度因子对词序列概率的作用</p>
-<p>为了直观说明尺度因子<script type="math/tex">\alpha</script> 的作用，图 3-1 给出了四个不同的尺度因子条件下词序列概率 <script type="math/tex">\mathbb{P}(W_i^j)^{\alpha}</script> 的变化。 假设 <script type="math/tex">\mathbb{P}(W_i^1)=0.9, \mathbb{P}(W_i^2)=0.8</script>，两条红色的水平虚线和纵轴的交点间距表示 <script type="math/tex">\alpha=1</script> 时两个词序列概率的差；而两条蓝色的水平虚线和纵轴的交点间距表示 <script type="math/tex">\alpha=0.25</script> 时两个词序列概率的差。从图 3-1 中可以看到，蓝色的交点间距明显小于红色的交点间距，所以应用更小的尺度因子可以减小词序列概率间的差异。</p>
-<h3 id="3-3-BMMI"><a href="#3-3-BMMI" class="headerlink" title="3.3 BMMI"></a>3.3 BMMI</h3><p>增强的 MMI (BMMI, Boosted MMI) 目标函数为,</p>
+<p>为了直观说明尺度因子 <script type="math/tex">\alpha</script> 的作用，图 3-1 给出了四个不同的尺度因子条件下词序列概率 <script type="math/tex">\mathbb{P}(W)^{\alpha}</script> 的变化。 假设 <script type="math/tex">\mathbb{P}(W^1)=0.9, \mathbb{P}(W^2)=0.8</script>，两条红色的水平虚线和纵轴的交点间距表示 <script type="math/tex">\alpha=1</script> 时两个词序列概率的差；而两条蓝色的水平虚线和纵轴的交点间距表示 <script type="math/tex">\alpha=0.25</script> 时两个词序列概率的差。从图 3-1 中可以看到，蓝色的交点间距明显小于红色的交点间距，所以应用更小的尺度因子可以减小词序列概率间的差异，从而增加混淆路径的数量。</p>
+<p>在文献 [] 中，scaled MMI 的尺度因子 $\alpha$ 在目标函数分子和分母上的声学模型上。将尺度因子 $\alpha$ 放到声学模型或者语言模型的目标是相似的，都是为了增加混淆路径的数量。不同之处在于，如果将尺度因子 $\alpha$ 放到语言模型上，减小 $\alpha$ 会增加混淆路径的数量；如果将尺度因子 $\alpha$ 放到声学模型上，减小 $\alpha$ 会减少混淆路径的数量。由于将 $\alpha$ 放到声学模型或语言模型上没有本质区别，同时将 $\alpha$ 放到语言模型上会得到形式上与 MMI 相同的梯度表达式 $(\ref{sec_scaled-mmi_grad})$，所以本书将 scaled MMI 的尺度因子 $\alpha$ 放到语言模型上。</p>
+<p>因为 scaled MMI 和 MMI 的目标函数仅在分子和分母上的语言模型有所不同，所以可以类似地求出 scaled MMI 目标函数关于参数 $\theta$ 的梯度。这里仅给出 $e_{mt}^{L}(i)=\grad_{z_{mt}^{L}(i)}J_{scaled_MMI}(W^{m},O^{m}|\theta)$ 的计算公式，</p>
 <script type="math/tex; mode=display">
-\sum_{i=1}^{N}\log\frac{\mathbb{P}_{\theta}(O_i|S_i)^{\alpha}\mathbb{P}(S_i)^{\alpha}}{\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)^{\alpha}\mathbb{P}(S_i^{j})^{\alpha}\exp\{-b\cdot A(S_i^j,S_i)\}}</script><p>其中 <script type="math/tex">\alpha</script> 是尺度因子，b 是非负的增强因子 (boosting factor), <script type="math/tex">A(W_i^j, W_i)</script> 度量备选文本 <script type="math/tex">W_i^j</script> 和正确文本 $W_i$ 之间的匹配程度。常用已经训练好的 GMM-HMM 或者 DNN-HMM 把音频信号 <script type="math/tex">O_i</script> 和 <script type="math/tex">W_i</script> 以及 <script type="math/tex">W_i^j</script> 分别进行帧-音素级别的对齐，然后统计两个帧-音素对齐中结果相同的帧数。<script type="math/tex">W_i^j</script> 和 <script type="math/tex">W_i</script> 匹配程度越高， 该备选词序列的重要度越低；反之 <script type="math/tex">W_i^j</script> 和 <script type="math/tex">W_i</script> 匹配程度越低，该备选词序列的重要度越高。最大化 BMMI 目标函数， 匹配程度较低的备选词序列相对于匹配程度较高的备选词序列来说，声学模型 <script type="math/tex">\mathbb{P}_{\theta}(O_i|W_i^j)</script> 的取值会变小。这就使得经过序列区分训练后的声学模型更倾向于选择更贴近真实词序列的备选答案。</p>
-<h3 id="3-4-MPE-MWE-sMBR"><a href="#3-4-MPE-MWE-sMBR" class="headerlink" title="3.4 MPE/MWE/sMBR"></a>3.4 MPE/MWE/sMBR</h3><p>BMMI 在 MMI 目标函数分母的每一项增加了权重，如果在 MMI 目标函数分子增加权重，修改目标函数如下，</p>
+\begin{align}
+e^L_{mt}(i) &= \sum_{r}\frac{\part{J_{scaled\_MMI}}(W^m,O^m|\theta)}{\part\log \mathbb{P}(O^m_t|S^m_t=r)}\frac{\part \log \mathbb{P}(O_{t}^m|S_t^m=r)}{\part z^L_{mt}(i)}  \\
+&= \sum_r \Big(\mathbb{1}(S_t^m=r)-\frac{\sum_{W\in\{W|S_t=r\}}P(O^m|S,\theta)P(W)^{\alpha}}{\sum_{W}\log P(O^m|S,\theta)P(W)^{\alpha}}\Big)\frac{\part\log P(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)}                \\ 
+&=\sum_{r}\Big(\mathbb{1}(S_t^m=r)-\gamma_{mt}^{den}(r)\Big)\frac{\part\log y_{mt}^L(r)}{\part z_{mt}^{L}(i)} \\ 
+&= \mathbb{1}(S_t^m=i) - \gamma_{mt}^{den}(i) \label{sec_scaled-mmi_grad}
+\end{align}</script><p>其中，</p>
 <script type="math/tex; mode=display">
-\sum_{i=1}^{N}\frac{\sum_j\mathbb{P}_{\theta}(O_i|S_i^j)^{\alpha}\mathbb{P}(S_i^j)^{\alpha}\cdot A(S_i^j, S_i)}{\sum_{j}\mathbb{P}_{\theta}(O_i|S_i^j)^{\alpha}\mathbb{P}(S_i^j)^{\alpha}}</script><p>需要特别注意上面的目标函数是N个训练样本上概率求和，而不是取了对数之后再求和。如果上面公式中的 <script type="math/tex">A(W_i^j,W_i)</script> 和 BMMI 一样，都是度量正确文本 <script type="math/tex">W_i</script> 和备选文本 <script type="math/tex">W_i^j</script> 之间帧-音素级别的匹配程度，则该目标函数被称为 MPE (Minimum Phone Error) 准则。 </p>
-<p>如果上面公式中的 <script type="math/tex">A(W_i^j, W_i)</script> 度量备选文本 <script type="math/tex">W_i</script> 和正确文本 <script type="math/tex">W_i^j</script> 对齐之后正确词 (字) 的个数，则该目标函数被称为 MWE (Minimum Word Error) 准则。文本之间的对齐可以参考编辑距离的计算，或者考虑 WER 的计算过程。</p>
-<p>如果上面公式中的 <script type="math/tex">A(W_i^j, W_i)</script> 度量备选文本 <script type="math/tex">W_i</script> 和正确文本 <script type="math/tex">W_i^j</script> 在帧-状态级别的匹配程度，即利用训练好的 GMM-HMM 或者 DNN-HMM 对音频信号 <script type="math/tex">O_i</script> 和 <script type="math/tex">W_i</script> 以及 <script type="math/tex">W_i^j</script> 分别进行帧-状态级别的对齐，然后统计两个帧-状态对齐中结果相同的帧数， 则该目标函数被称为 sMBR (state-Minimum Bayesian Risk)。 </p>
-<p>不论是 MPE，MWE 或者 sMBR， 都是给予了和正确文本相似的备选文本较高的权重，优化目标函数之后得到的声学模型 <script type="math/tex">\mathbb{P}_{\theta}(O_i|W_i^j)</script> 在相似度高的文本上给予较高的声学得分，而在相似度低的文本上给予较低的声学得分。</p>
-<p>对比 MPE 和 MWE 的目标函数，理论上，当训练数据量趋于无穷， MWE 的目标函数应该逼近模型的泛化 WER， 所以最小化 MWE 的目标函数应该和最小化 WER 的目标更匹配。  但是，在目前能够得到的训练集上，实验结果表明 MPE 在测试集上的表现比 MWE 的更好一些 [Povey, 2003]。</p>
-<h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-本章小结"><a href="#5-本章小结" class="headerlink" title="5. 本章小结"></a>5. 本章小结</h2><h2 id="6-参考资料"><a href="#6-参考资料" class="headerlink" title="6. 参考资料"></a>6. 参考资料</h2><h2 id="7-附录"><a href="#7-附录" class="headerlink" title="7. 附录"></a>7. 附录</h2><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
+\begin{align}
+\gamma_{mt}^{den}(r)=\frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}}
+\end{align}</script><h3 id="3-3-BMMI"><a href="#3-3-BMMI" class="headerlink" title="3.3 BMMI"></a>3.3 BMMI</h3><p>基于 scaled MMI 目标函数，如果能够提升声学模型对于包含较多错误的路径与正确路径之间的区分度，就可以减少最终识别结果中的错误率。基于这种想法，对 scaled MMI 目标函数 $(\ref{sec_scaled_mmi_obj})$ 分母上包含错误较多的路径给予更高的权重，提出了增强的 MMI (BMMI, Boosted MMI)，其目标函数如下，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+J_{BMMI}(\mathbb{S}|\theta)&= \sum_{m=1}^M J_{BMMI}(W^m,O^m|\theta) \\
+&=\sum_{m=1}^{M}\log\frac{\mathbb{P}(O^m|W^m,\theta)\mathbb{P}(W^m)^{\alpha}}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\exp\{-b\cdot A(W,W^m)\}} \\
+&= \sum_{m=1}^M\log\frac{\mathbb{P}(O^m|S^m,\theta)\mathbb{P}(W^m)^{\alpha}}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}\exp\{-b\cdot A(W,W^m)\}} \label{sec_bmmi_obj}
+\end{align}</script><p>其中 <script type="math/tex">\alpha</script> 是尺度因子，b 是非负的增强因子 (boosting factor)，<script type="math/tex">A(W^m, W)</script> 是正确文本 <script type="math/tex">W^m</script> 和备选文本 $W$ 之间的匹配程度度量，可以从词，音素和状态三个层面计算。例如考虑音素层面的匹配程度，常用已训练好的 GMM-HMM 或者 DNN-HMM 把音频信号 <script type="math/tex">O^m</script> 和 <script type="math/tex">W^m</script>/ <script type="math/tex">W</script> 分别进行帧-音素级别的对齐，然后统计两个帧-音素对齐中结果相同的帧数。<script type="math/tex">W^m</script> 和 <script type="math/tex">W</script> 匹配程度越高， 该备选词序列 $W$ 的重要度越低；反之 <script type="math/tex">W^m</script> 和 <script type="math/tex">W</script> 匹配程度越低，该备选词序列 $W$ 的重要度越高。最大化 BMMI 目标函数 $(\ref{sec_bmmi_obj})$，匹配程度较低的备选词序列相对于匹配程度较高的备选词序列来说，声学模型 <script type="math/tex">\mathbb{P}_{\theta}(O_i|W_i^j)</script> 的取值会变小。这就使得经过序列区分训练后的声学模型更倾向于选择贴近正确词序列的备选答案。</p>
+<p>对比 scaled MMI 的目标函数，BMMI 仅在分母上的求和号中增加了增强系数 (boosting term) $\exp\{-b\cdot A(W, W^m)\}$，所以这里仅给出 $e_{mt}^{L}(i)=\grad_{z_{mt}^{L}(i)}J_{BMMI}(W^{m},O^{m}|\theta)$ 的计算公式，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+e^L_{mt}(i) &= \sum_{r}\frac{\part{J_{BMMI}}(W^m,O^m|\theta)}{\part\log \mathbb{P}(O^m_t|S^m_t=r)}\frac{\part \log \mathbb{P}(O_{t}^m|S_t^m=r)}{\part z^L_{mt}(i)}  \\
+&= \sum_r \Big(\mathbb{1}(S_t^m=r)-\frac{\sum_{W\in\{W|S_t=r\}}P(O^m|S,\theta)P(W)^{\alpha}\exp\{-b\cdot A(W,W^m)\}}{\sum_{W}\log P(O^m|S,\theta)P(W)^{\alpha}\exp\{-b\cdot A(W,W^m)\}}\Big)\frac{\part\log P(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)}                \\ 
+&=\sum_{r}\Big(\mathbb{1}(S_t^m=r)-\gamma_{mt}^{den}(r)\Big)\frac{\part\log y_{mt}^L(r)}{\part z_{mt}^{L}(i)} \\ 
+&= \mathbb{1}(S_t^m=i) - \gamma_{mt}^{den}(i) \label{sec_bmmi_grad}
+\end{align}</script><p>其中，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\gamma_{mt}^{den}(r)=\frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}\exp\{-b\cdot A(W,W^m)\}}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}\exp\{-b\cdot A(W,W^m)\}}
+\end{align}</script><p>为了能够快速地计算 BMMI 目标函数的梯度，需要能够快速地计算 $A(W, W^m)$。</p>
+<h3 id="3-4-MPE-MWE-sMBR"><a href="#3-4-MPE-MWE-sMBR" class="headerlink" title="3.4 MPE/MWE/sMBR"></a>3.4 MPE/MWE/sMBR</h3><p>如果在 scaled MMI 的目标函数分子上增加权重，则引出了如下最小化贝叶斯风险 (MBR, Minimum Bayesian Risk) 目标函数族，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+J_{MBR}(\mathbb{S}|\theta) &= \sum_{m=1}^M J_{MBR}(W^m,O^m|\theta) \\
+&=\sum_{m=1}^{M}\frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha} A(W, W^m)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}  \\
+&=\sum_{m=1}^{M}\frac{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}A(W, W^m)}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}} \label{sec_mbr_obj}
+\end{align}</script><p>其中 $A(W, W^m)$ 和在 BMMI 中的含义相同。需要特别注意上面的目标函数 $(\ref{sec_mbr_obj})$ 是 M 个训练样本对应的概率求和，而不是取了对数之后再求和。</p>
+<p>如果公式 $(\ref{sec_mbr_obj})$ 中的 <script type="math/tex">A(W,W^{m})</script> 度量的是正确文本 <script type="math/tex">W^{m}</script> 和备选文本 <script type="math/tex">W</script> 之间音素级别的匹配程度，则该目标函数被称为最小化音素错误 ( MPE，Minimum Phone Error) ；如果 <script type="math/tex">A(W, W^m)</script> 度量的是正确文本 <script type="math/tex">W^m</script> 和备选文本 <script type="math/tex">W</script> 对齐后正确词 (字) 的个数，则该目标函数被称为最小化词错误 (MWE，Minimum Word Error) 。文本之间的对齐可以参考编辑距离或 WER 的计算；如果 <script type="math/tex">A(W, W^m)</script> 度量的是正确文本 <script type="math/tex">W^m</script> 和备选文本 <script type="math/tex">W</script> 在状态级别的匹配程度，即利用训练好的 GMM-HMM 或者 DNN-HMM 对音频信号 <script type="math/tex">O^m</script> 和 <script type="math/tex">W^m</script>/ <script type="math/tex">W</script> 分别进行帧-状态级别的对齐，然后统计两个帧-状态对齐中结果相同的帧数， 则该目标函数被称为状态级的最小贝叶斯风险 (sMBR，state-Minimum Bayesian Risk)。 </p>
+<p>不论是 MPE，MWE 或者 sMBR， 都是给予了和正确文本更相似的备选文本较高的权重，优化目标函数之后得到的声学模型 <script type="math/tex">\mathbb{P}(O^m|W,\theta)</script> 将在相似度较高的文本上给予更高的声学得分，而在相似度较低的文本上给予更低的声学得分。</p>
+<p>对比 MPE 和 MWE 的目标函数，理论上，当训练数据量趋于无穷， MWE 的目标函数应该逼近模型的泛化 WER， 所以最小化 MWE 的目标函数应该和最小化 WER 的目标更匹配。  但是，实验结果表明，在多数的训练集上进行序列区分性训练之后，MPE 在测试集上的表现比 MWE 的更好一些 [Povey, 2003]。</p>
+<p>类似于 BMMI，下面给出了 $e_{mt}^L(i)$ 的计算公式，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+e_{mt}^{L}(i)&=\sum_{r}\frac{\part J_{MBR}(W^m,O^m|\theta)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)} \\
+&= \sum_{r}\gamma_{mt}^{den}(r)\big(B^m(S_t=r)-B^m\big)\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)} \label{mbr_grad_result}
+\end{align}</script><p>其中，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\gamma_{mt}^{den}(r)&=\sum_{W}\mathbb{1}(S_t=r)\frac{\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}}\\
+B^m(S_t=r)&=\frac{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)} \\
+B^m&=\frac{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}}
+
+\end{align}</script><p>证明的细节参考附录 <a href="#mbr_grad_der">7.3</a></p>
+<h3 id="3-5-训练准则的比较"><a href="#3-5-训练准则的比较" class="headerlink" title="3.5. 训练准则的比较"></a>3.5. 训练准则的比较</h3><p>介绍了前面的序列判别式训练的准则，到底实践当中应该选择什么样的准则呢？ 在文献 [] 中分别使用了不同的训练准则来训练模型，结果显示使用不同的序列区分性训练准则进行训练得到的模型在测试集上结果并没有很大的差异。从 SWB Hub5‘00 和 Hub5’01 两个测试集上的 WER 来看，DNN + sMBR 的结果相对来说更好一些。但是由于 MMI 和 scaled MMI 更容易被理解和实现，所以实际中使用较多，例如 chain 模型就主要使用 MMI 准则进行优化。</p>
+<h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-本章小结"><a href="#5-本章小结" class="headerlink" title="5. 本章小结"></a>5. 本章小结</h2><h2 id="6-参考资料"><a href="#6-参考资料" class="headerlink" title="6. 参考资料"></a>6. 参考资料</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="7-附录"><a href="#7-附录" class="headerlink" title="7. 附录"></a>7. 附录</h2><h3 id="7-1"><a href="#7-1" class="headerlink" title="7.1"></a>7.1</h3><h3 id="7-2"><a href="#7-2" class="headerlink" title="7.2 "></a>7.2 <a name="mmi_grad_der"></h3><script type="math/tex; mode=display">
+\begin{align}
+e^L_{mt}(i)&=\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part z_{mt}^L(i)} \\
+&=\sum_{r}\Big(\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part \log \mathbb{P}(O_t^m|S^m_t=r)}\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)}\Big) \label{append2_emtl}
+\end{align}</script><p>对等式 $(\ref{append2_emtl})$ 求和号中的两项分别进行求解。首先 ，求解第一项</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part \log \mathbb{P}(O_t^m|S^m_t=r)} &= \frac{\part\log\frac{\mathbb{P}(O^m|S^m)\mathbb{P}(W^m)}{\sum_W\mathbb{P}(O^m|S, \theta)\mathbb{P}(W)}}{\part\log\mathbb{P}(O_t^m|S_t^m=r)} \\
+&= \frac{\part \log\mathbb{P}(O^m|S^m)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}-\frac{\part \log\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}  \label{append2_mmi_sub}
+\end{align}</script><p>求解等式 $(\ref{append2_mmi_sub})$ 中第一项可得，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part \log\mathbb{P}(O^m|S^m)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}=\frac{\part\log\mathbb{P}(O_1^m|S_1^m)\cdots\mathbb{P}(O_{T_m}^m|S_{T_m}^m)}{\part \log\mathbb{P}(O_t^m|S_t^m=r)}=\mathbb{1}(S_t^m=r) \label{append2_mmi_sub1}
+\end{align}</script><p>求解等式 $(\ref{append2_mmi_sub})$ 中第二项可得，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part \log\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}&=\frac{1}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}\frac{\part \sum_W\exp\{\log\big(\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)\big)\}}{\part \log\mathbb{P}(O^m_t|S_t^m=r)} \\
+&=\frac{1}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)\frac{\part \log\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\part \log\mathbb{P}(O_t^m|S_t^m=r)} \\
+&= \frac{1}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)\mathbb{1}(S_t=r) \\
+&= \frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)} \label{append2_mmi_sub2}
+\end{align}</script><p>综合 $(\ref{append2_mmi_sub1})$ 和 $(\ref{append2_mmi_sub2})$，可知，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part \log \mathbb{P}(O_t^m|S^m_t=r)}&=\mathbb{1}(S_t^m=r) - \frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)} \label{append2_mmi_part1}
+\end{align}</script><p>其次求解 $(\ref{append2_emtl})$ 求和号中的第二项，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)}&=\frac{\part[\log\mathbb{P}(S_t^m=r|O^m_t)\mathbb{P}(O_t^m) - \log\mathbb{P}(S_t^m=r)]}{\part z_{mt}^L(i)} \\
+&=\frac{\part\log\mathbb{P}(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)} +\frac{\part\log\mathbb{P}(O_t^m)}{\part z_{mt}^L(i)} - \frac{\part\log\mathbb{P}(S_t^m=r)}{\part z_{mt}^L(i)} \\
+&= \frac{\part\log\mathbb{P}(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)} \\
+&=\frac{1}{\mathbb{P}(S_t^m=r|O_t^m)}\frac{\part \mathbb{P}(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)}  \\
+&= \frac{1}{\mathbb{P}(S_t^m=r|O_t^m)}\frac{\part \frac{\exp\big(z_{mt}^L(r)\big)}{\sum_{k=1}^{n_L}\exp\big(z_{mt}^L(k)\big)}}{\part z^L_{mt}(i)}   \\
+&= \frac{1}{\mathbb{P}(S_t^m=r|O_t^m)} \mathbb{P}(S_t^m=r|O_t^m)\big(\delta_{ir}-\mathbb{P}(S_t^m=i|O_t^m)\big) \\
+&= \delta_{ir} - \mathbb{P}(S_t^m=i|O_t^m) \label{append2_mmi_part2}
+
+\end{align}</script><p>综合 $(\ref{append2_mmi_part1})$ 和 $(\ref{append2_mmi_part2})$ 的结果，最后可得</p>
+<script type="math/tex; mode=display">
+\begin{align}
+e^L_{mt}(i)&=\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part z_{mt}^L(i)} \\
+&=\sum_{r}\Big(\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part \log \mathbb{P}(O_t^m|S^m_t=r)}\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)}\Big)\\
+&=\sum_{r}\Big(\mathbb{1}(S_t^m=r) - \frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}\Big)\frac{\part\log\mathbb{P}(S_t^m=r|O_t^m)}{\part z_{mt}^L(i)} \\
+&= \sum_{r}\Big(\mathbb{1}(S_t^m=r) - \frac{\sum_{W\in\{W|S_t=r\}}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}{\sum_W\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)}\Big) \Big(\delta_{ir} - \mathbb{P}(S_t^m=i|O_t^m)\Big)  \\ 
+&= \mathbb{1}(S_t^m=i) - \gamma_{mt}^{den}(i)
+\end{align}</script><h3 id="lt-a-gt"><a href="#lt-a-gt" class="headerlink" title="&lt;/a&gt;"></a>&lt;/a&gt;</h3><h3 id="7-3"><a href="#7-3" class="headerlink" title="7.3 "></a>7.3 <a name="mbr_grad_der"></h3><script type="math/tex; mode=display">
+\begin{align}
+e_{mt}^{L}(i)&=\sum_{r}\frac{\part J_{MBR}(W^m,O^m|\theta)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)} \label{mbr_grad}
+\end{align}</script><p>分别对等式 $(\ref{mbr_grad})$ 右边求和号中的两项分别进行求解。首先求解第一项，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part J_{MBR}(W^m,O^m|\theta)}{\part \log\mathbb{P}(O_t^m|S_t^m=r)} &= \frac{\part\frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}}{\part \log\mathbb{P}(O_t^m|S_t^m=r)} \\
+&= \frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}\frac{\part\log\Big(\frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W, W^m)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}\Big)}{\part \log\mathbb{P}(O_t^m|S_t^m=r)}  \\
+= \frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}&\Big(\frac{\part\log\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}-\frac{\part\log\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}\Big)\label{mbr_grad_part1_1}
+\end{align}</script><p> 继续对上面的等式 $(\ref{mbr_grad_part1_1})$ 括号中的两项进行求解，其中的第一项为，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part\log\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}&=\frac{\frac{\part\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)} \\
+&=\frac{\log\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)} \\
+&=\frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)\frac{\part\log\mathbb{P}(O^m|S,\theta)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)} \\
+&=\frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)} \label{mbr_grad_part1_1_1}
+\end{align}</script><p>第二项为，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\part\log\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}{\part\log\mathbb{P}(O_t^m|S_t^m=r)} &= \frac{\frac{\part\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}{\part\log\mathbb{P}(O^m_t|S_t^m=r)}}{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}} \\
+&= \frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)}{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}\label{mbr_grad_part1_1_2}
+
+\end{align}</script><p>综合等式 $(\ref{mbr_grad_part1_1_1})$ 和 $(\ref{mbr_grad_part1_1_2})$, 可得</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&\frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)} - \frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)}{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}} \\
+&=A^m(r)\big(B^m(S_t=r)-B^m\big)
+\end{align}</script><p>其中</p>
+<script type="math/tex; mode=display">
+\begin{align}
+A^m(r)&=\frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}\\
+B^{m}(S_t=r)&=\frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)}\\
+B^{m}&=\frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}\Big)
+\end{align}</script><p>最终得到如下结果，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+e_{mt}^{L}(i)&=\sum_{r}\frac{\part J_{MBR}(W^m,O^m|\theta)}{\part\log\mathbb{P}(O_t^m|S_t^m=r)}\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)} \\
+&=\sum_{r}\frac{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_W\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}A^m(r)\big(B^m(S_t=r)-B^m\big)\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)}  \\
+&=\sum_{r}\frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}\big(B^m(S_t=r)-B^m\big)\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)} \\
+&=\sum_{r}\gamma_{mt}^{den}(r)\big(B^m(S_t=r)-B^m\big)\frac{\part\log\mathbb{P}(O_t^m|S_t^m=r)}{\part z_{mt}^L(i)}
+\end{align}</script><p>其中，$\gamma_{mt}^{den}(r)=\frac{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}\mathbb{1}(S_t=r)}{\sum_{W}\mathbb{P}(O^m|W,\theta)\mathbb{P}(W)^{\alpha}}$，式 $(\ref{mbr_grad_result})$ 得证。</p>
+<h3 id="lt-a-gt-1"><a href="#lt-a-gt-1" class="headerlink" title="&lt;/a&gt;"></a>&lt;/a&gt;</h3><h2 id="Text-Formatting"><a href="#Text-Formatting" class="headerlink" title="Text Formatting"></a>Text Formatting</h2><p>Regular, <strong>bold</strong>, <em>italic</em>, <del>strike</del>, ==hightlight==, <code>inline-code</code>,*emphasis^,<!--comment-->,</p>
 <h2 id="Cites"><a href="#Cites" class="headerlink" title="Cites"></a>Cites</h2><blockquote>
-<p>[Povey ]e</p>
+<p>[Povey ]</p>
 </blockquote>
 <h2 id="Code"><a href="#Code" class="headerlink" title="Code:"></a>Code:</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> someCode <span class="keyword">from</span> <span class="string">&#x27;someLibrary&#x27;</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <h2 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h2><p><a href="www.google.com">This is a link</a></p>
 <h2 id="Footnote"><a href="#Footnote" class="headerlink" title="Footnote"></a>Footnote</h2><p>Wome thing </p>
-<h2 id="Wuperscripts"><a href="#Wuperscripts" class="headerlink" title="Wuperscripts"></a>Wuperscripts</h2><p>Example^1^</p>
+<h2 id="upper-scripts"><a href="#upper-scripts" class="headerlink" title="upper scripts"></a>upper scripts</h2><p>Example^1^</p>
 <p>Example~2~</p>
  
       <!-- reward -->
