@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Kaldi 示例 |  暄妍</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css"
+      />
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="暄妍" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-paper-0.0.3/chapters/kaldi_sat"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Kaldi 示例
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2022/02/12/paper-0.0.3/chapters/kaldi_sat/" class="article-date">
+  <time datetime="2022-02-12T07:16:05.075Z" itemprop="datePublished">2022-02-12</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">5.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">26 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p><h1 style="text-align: center"> 说话人自适应</h1></p>
+<div style="text-align: center"><small>陈代君 - 2022</small></div>
+
+<p><strong>摘要</strong>: 。</p>
+<h2 id="1-语音识别中的泛化问题"><a href="#1-语音识别中的泛化问题" class="headerlink" title="1. 语音识别中的泛化问题"></a>1. 语音识别中的泛化问题</h2><p>在传统的机器学习中 ，为了能够推导出模型的泛化能力，总是假设模型的训练数据和真实场景的测试数据来自于同一个分布。如果测试集和训练集来自于不同的分布，则很可能出现模型在测试集上的表现相较于开发集 (与训练集同分布) 差很多。</p>
+<p>在语音识别领域，由于如下的原因，</p>
+<ul>
+<li>不同的测试条件不能都被训练数据覆盖。例如，训练数据主要来自于朗读场景的语音识别模型如果应用在车载语音助手上，其识别率肯定会差很多。朗读场景和车载场景主要的差别有两个方面。首先，从语言模型的角度，朗读场景和车载场景下所使用的词汇是很不一样的，很多车载相关的专有名词很少甚至不会出现在朗读数据中。另外，从声学模型的角度，朗读场景相对车载环境更安静，车载场景中包含了例如车噪，胎噪，雨刮器产生的噪音等非语言相关的声音信号。</li>
+<li>训练数据中的说话人数量远小于语音识别系统的使用者。训练数据通常来自于少量的说话人录音，而使用中经常会有不同口音，性别，年龄的使用者。</li>
+</ul>
+<p>语音识别将不同声学条件视为不同的说话人，所以把提高在训练与测试数据分布不一致情形下模型表现的方法统称为说话人自适应 (speaker adaptation)。</p>
+<p>可能会导致训练模型的数据和真实场景下的测试数据差异很大。为了提高模型在未知场景下的识别率，可以从如下两个方面来进行改进。</p>
+<ul>
+<li><p>基于模型 (model-based) 的改进：针对不同的使用场景和说话人，对模型进行调整，使得新模型在给定的使用场景下表现得以提升。</p>
+</li>
+<li><p>基于特征 (feature-based) 的改进：针对不同的使用场景和说话人，对语音特征进行调整，使得调整后的特征能够更好的匹配原有模型。</p>
+</li>
+</ul>
+<h2 id="2-问题的分类"><a href="#2-问题的分类" class="headerlink" title="2. 问题的分类"></a>2. 问题的分类</h2><p>在介绍具体的改进方法之前，本小节先按照不同的标准对说话人自适应问题进行分类。</p>
+<p>首先按照测试数据是否含有标注进行分类。如果在语音识别的测试阶段，知道输入语音信号的文本，则称为有监督的自适应识别。否则，称为无监督的自适应识别。图 2-1 中展示了监督和无监督情形下的说话人自适应问题。</p>
+<p><p align = "center"><br>    <img height="200px" src = "./images/sat_class1.png"><br>    图 2-1 说话人自适应问题按测试数据有无标注进行分类。</p>
+<p> 其次按照优化方式进行分类。如果通过修改模型 $P(W|O,\theta)$ 的参数 $\theta$ 来提高在测试集上的识别率，则称为自适应 (adaptation)，等价于前面提到的基于模型的改进。如果通过对输入的声学信号进行变换来提高模型在测试集上的识别率，则称为正则化 (normalization)，等价于前面提到的基于特征的改进。</p>
+<p><p align = "center"><br>    <img height="235px" src = "./images/sat_class2.png"><br>    图 2-2 说话人自适应问题按优化方式进行分类。</p>
+<p>最后按照识别过程的实时性进行分类。如果不要求实时返回识别结果，可以得到所有输入音频后再进行识别，则称为批处理 (batch) 自适应。如果要求实时返回识别结果，则称为增量式 (incremental) 自适应。</p>
+<p>介绍完说话人自适应分类之后，根据声学模型的不同，本章分别介绍 GMM-HMM 声学模型的说话人自适应和 DNN-HMM 声学模型的自适应。</p>
+<h2 id="3-GMM-HMM-的说话人自适应"><a href="#3-GMM-HMM-的说话人自适应" class="headerlink" title="3. GMM-HMM 的说话人自适应"></a>3. GMM-HMM 的说话人自适应</h2><p>对于 GMM-HMM 系统，按照优化方式进行分类，类似地可以分为模型自适应和特征变换。</p>
+<h3 id="3-1-模型自适应"><a href="#3-1-模型自适应" class="headerlink" title="3.1 模型自适应"></a>3.1 模型自适应</h3><p>关于 GMM-HMM 系统的模型自适应，可以调整的参数包括 HMM 状态之间的转移概率，GMM 各分量上正态分布的均值向量和对角协方差矩阵，以及各分量的权重。由于 GMM-HMM 中，主要通过 GMM 来表征说话人的特征，所以模型自适应主要通过调整 GMM 中的各项参数来提高模型在测试集上的识别率。常用的模型自适应方法包含最大后验概率 (MAP: maximum a posterior) 和极大似然线性回归 (MLLR: maximum likelihood linear regression)。</p>
+<h4 id="3-1-1-MAP"><a href="#3-1-1-MAP" class="headerlink" title="3.1.1 MAP"></a>3.1.1 MAP</h4><p>MAP 方法属于有监督的自适应方法。首先，在进行模型自适应之前，需要准备说话人所对应的音频和标注文本。其次，对每一个音频以及标注文本 $(O^m, W^m)$，利用现有的模型进行状态级别的维特比对齐，得到帧与 HMM 状态的对齐关系 $\{(O^m_{t},S^m_{t})\}_{t=1}^{T_m}$，其中 $O_t^m$ 表示语音信号序列 $O^m$ 的第 $t$ 帧，$S_t^m$ 表示第 $t$ 帧所对应的 HMM 状态，$m=1,\dots,M$。再次，对第 $i$ 个 HMM 的第 $j$ 个隐状态 $s_{ij}$ ， 收集并排序该说话人语音信号中所有对齐到该状态的帧，记为 $\{O_{t}^{ij}\}_{t=1}^{T_{ij}}$，其中 $T_{ij}$ 表示对齐到 $s_{ij}$ 的帧的数量。最后，通过状态 $s_{ij}$ 对应的 GMM 将 $O_{t}^{ij}$ 分配到具体的正态分布。这里的分配有两种方式，第一种方式是将 $O^{ij}_t$ 分配到概率最大的正态分布；第二种方式是以条件概率 $P(O^{ij}_t|\mu_{ijk},\Sigma_{ijk})$ 将 $O_t^{ij}$ 分配到第 $k$ 个正态分布。为了方便，这里采用第一种方式，对于状态 $s_{ij}$ 的第 $k$ 个正态分布成分，收集并排序该说话人语音信号中所有对齐到该正态分布成分的帧，记为 $\{O_{t}^{ijk}\}_{t=1}^{T_{ijk}}$。</p>
+<p><p align = "center"><br>    <img height="235px" src = "./images/sat_map1.png"><br>    图 3-1 给定说话人，对状态的 GMM 成分构造帧集合。</p>
+<p>图 3-1 展示了给定说话人音频和标注文本 $(O^m, W^m)$ 之后，对状态 $s_{ij}$ 的第 $k$ 个正态分布成分构造帧集合 $\{O_{t}^{ijk}\}_{t=1}^{T_{ijk}}$。 </p>
+<p>给定说话人的样本 $\{(O^m, W^m)\}_{m=1}^M$ , 对正态分布成分构造好帧集合之后，基于帧集合对该正态分布的均值向量进行调整，使得调整后的模型更好的拟合该说话人的声学特征。假设说话人无关（SI，speaker independent）模型中，状态 $s_{ij}$ 的第 $k$ 个正态分布成分为 $N(\mu_{ijk}^{SI},\Sigma^{SI}_{ijk})$，且说话人相关（SD，speaker dependent）模型中均值向量 $\mu_{ijk}^{SD}$ 的先验分布为</p>
+<script type="math/tex; mode=display">
+p(\mu_{ijk}^{SD}) = N(\mu_{ijk}^{SI},\Sigma_{ijk})</script><p>条件分布为</p>
+<script type="math/tex; mode=display">
+p(\{O^{ijk}_{t}\}_{t=1}^{T}|\mu_{ijk}^{SD},\Sigma_{ijk}^{SI}) = \Pi_{t=1}^{T} N(O_{t}^{ijk}|\mu_{ijk}^{SD},\Sigma_{ijk}^{SI})</script><p>利用 Bayes 公式，推导出如下后验分布</p>
+<script type="math/tex; mode=display">
+\begin{align}
+p(\mu_{ijk}^{SD}|\{O_{t}^{ijk}\}_{t=1}^{T},\Sigma_{ijk}^{SI})&\propto p(\{O_{t}^{ijk}\}_{t=1}^{T}|\mu_{ijk}^{SD},\Sigma_{ijk}^{SI}) p(\mu_{ijk}^{SD}) 
+\end{align}</script><p>极大化后验分布，得到说话人相关均值向量的后验估计如下，</p>
+<script type="math/tex; mode=display">
+\hat{\mu}_{ijk}^{SD}(l) = \alpha(l) \hat{\mu}^{ML}_{ijk}(l) + (1-\alpha(l))\mu_{ijk}^{SI}(l) \label{formula_MAP_interp}</script><p>其中 $\hat{\mu}_{ijk}^{ML}$ 表示均值向量的极大似然估计， $\alpha$ 表示插值系数。具体公式如下，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\hat{\mu}_{ijk}^{ML} &= \frac{1}{T_{ijk}}\sum_{t=1}^{T_{ijk}}O^{ijk}_{t} \\
+\alpha(l) &= \frac{T_{ijk}\Sigma_{ijk}(l)}{T_{ijk}\Sigma_{ijk}(l)+\Sigma_{ijk}^{SI}(l)}
+\end{align}</script><p>从公式 ($\ref{formula_MAP_interp}$) 可知，MAP 的自适应方法将极大似然估计 $\hat{\mu}^{ML}_{ijk}$ 和原始模型参数 $\mu_{ijk}^{SI}$ 加权平均之后的结果作为说话人相关的模型参数。对于状态 $s_{ij}$ 的第 $k$ 个正态分布成分， 如果对应的帧较少甚至没有帧与之对应，则经过 MAP 调整后的模型参数更接近原始模型参数 $\mu_{ijk}^{SI}$；如果对应的帧较多，则经过 MAP 调整后的模型参数更接近极大似然估计 $\hat{\mu}^{ML}_{ijk}$，这表明仅用该说话人样本估计的模型参数已经是可靠的。</p>
+<p>MAP 对模型各参数的调整是独立的，针对不同状态的正态分布成分对应帧的数量，采取不同的调整策略。虽然 MAP 方法很灵活，但是因为音素，状态和正态分布成分不能共享该说话人提供的信息，导致那些所属帧数量较少的正态分布成分极难进行更新。为了能够充分利用说话人提供的信息来更新模型的各参数，可以采用下面将要介绍的 MLLR 方法。</p>
+<h4 id="3-1-2-MLLR"><a href="#3-1-2-MLLR" class="headerlink" title="3.1.2 MLLR"></a>3.1.2 MLLR</h4><p>假设原始模型参数可以通过某种变换之后，使得调整后的模型可以更好地拟合说话人声学特征。在均值上应用 MLLR，采用如下简单的线性变换，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\mu_{ijk} = \mathbf{T}\mu_{ijk}^{SI} 
+\end{align}</script><p>其中 $\mathbf{T}$ 是一个与音素，状态和正态分布成分无关的方阵。MLLR 的目标是选择合适的 $\mathbf{T}$ 让说话人数据在调整后的模型下似然达到最大。</p>
+<h5 id="3-1-2-1-有监督情形"><a href="#3-1-2-1-有监督情形" class="headerlink" title="3.1.2.1 有监督情形"></a>3.1.2.1 有监督情形</h5><p>MLLR 方法可以应用在有监督的情形，也可以应用在无监督的情形。本小节先介绍有监督的情形，类似于 MAP 方法，给定说话人音频和标注文本 $(O^m, W^m)$ 之后，对状态 $s_{ij}$ 的第 $k$ 个正态分布成分构造帧集合 $\{O_{t}^{ij}\}_{t=1}^{T_{ij}}$。MLLR 的目标函数如下，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&L(\mathbf{T}|\{(O^m, W^m)\}_{m=1}^{M}) = \sum_{m=1}^{M}\log p\big(O^m|W^m,\mathbf{T}\big)  \\
+&= \sum_{i,j}\sum_{t=1}^{T_{ij}}\log\sum_{k=1}^{K_{ij}}w_{ijk}p(O_t^{ij}|\mathbf{T}\mu_{ijk}^{SI},\Sigma_{ijk}^{SI}) \\
+&= \sum_{i,j}\sum_{t=1}^{T_{ij}}\log\sum_{k=1}^{K_{ij}}\frac{w_{ijk}}{(2\pi)^{\frac{d}{2}}(\det\Sigma_{ijk}^{SI})^{\frac{1}{2}}}\exp\big\{-\frac{1}{2}(O_{t}^{ij}-\mathbf{T}\mu_{ijk}^{SI})^T(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ij}-\mathbf{T}\mu_{ijk}^{SI})\big\} \label{mllr_sup_obj}
+\end{align}</script><p>其中 $K_{ij}$ 表示对应状态 $s_{ij}$ 的 GMM 正态分布成分的数量，$w_{ijk}$ 表示状态 $s_{ij}$ 的 GMM 中第 $k$ 个正态成分的权重。 </p>
+<h5 id="3-1-2-2-无监督情形"><a href="#3-1-2-2-无监督情形" class="headerlink" title="3.1.2.2 无监督情形"></a>3.1.2.2 无监督情形</h5><p>MLLR 方法在无监督的情形，目标函数如下，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+L(\mathbf{T},\{W^m\}_{m=1}^{M}|\{O^{m}\}_{m=1}^{M}) &= \sum_{m=1}^{M}\log p(O^m,W^m|\mathbf{T}) \\
+&= \sum_{m=1}^{M}\log \{p(O^m|W^m,\mathbf{T})p(W^m)\} \label{mllr_unsup_obj}
+\end{align}</script><p>由于无监督情形下，$\{W^m\}_{m=1}^{M}$ 是未知的，所以需要同时关于方阵 $\mathbf{T}$ 和 $\{W^m\}_{m=1}^{M}$ 将对数似然函数 $L(\mathbf{T},\{W^m\}_{m=1}^{M}|\{O^{m}\}_{m=1}^{M})$ 进行极大化。</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{T}},\{\hat{W}^m\}_{m=1}^M = \arg\max_{\mathbf{T},W^m} L(\mathbf{T},\{W^m\}_{m=1}^M\}|\{O^m\}_{m=1}^M)</script><p>但是同时关于两组参数进行优化，在实际中有很大的困难。因此实际中，通常采用类似于坐标下降 (coordinate descent) 的方法，分步求解方阵 $\mathbf{T}$ 和 文本 $\{W^m\}_{m=1}^M$。</p>
+<ol>
+<li><p>给定某说话人声学特征序列集合 $\{O^m\}_{m=1}^{M}$, 利用已有的说话人无关模型识别出对应的文本 $\{\hat{W}^m\}_{m=1}^{M}$。</p>
+</li>
+<li><p>将样本 $\{(O^m,\hat{W}^m)\}_{m=1}^M$ 带入目标函数 $(\ref{mllr_unsup_obj})$, 类似上面有监督的情形求出方阵 $\hat{\mathbf{T}}$，即</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\hat{\mathbf{T}} &= \arg\max_{\mathbf{T}}\sum_{m=1}^{M}\log \{p(O^m|\hat{W}^m,\mathbf{T})p(\hat{W}^m)\} \\ 
+&= \arg\max_{\mathbf{T}}\sum_{m=1}^{M}\log p(O^m|\hat{W}^m,\mathbf{T})\label{mllr_unsup_opt}
+\end{align}</script></li>
+<li><p>利用 ($\ref{mllr_unsup_opt}$) 中 $\hat{\mathbf{T}}$ ，调整当前模型参数，</p>
+<script type="math/tex; mode=display">
+\mu_{ijk} = \hat{\mathbf{T}}\mu_{ijk}</script><p>并返回步骤 1. 直到参数收敛或达到预设的最大迭代步数。</p>
+</li>
+</ol>
+<h5 id="3-1-2-3-MLLR-的优化"><a href="#3-1-2-3-MLLR-的优化" class="headerlink" title="3.1.2.3 MLLR 的优化"></a>3.1.2.3 MLLR 的优化</h5><p>综合上面 MLLR 的有监督和无监督情形，最终都需要求解 ($\ref{mllr_sup_obj}$) 和 ($\ref{mllr_unsup_opt}$) 中相似的优化问题。因此有必要统一介绍求解优化问题的细节。具体的目标函数如下，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&\sum_{m=1}^{M}\log p\big(O^m|W^m,\mathbf{T}\big)  \\
+&=\sum_{i,j}\sum_{t=1}^{T_{ij}}\log\sum_{k=1}^{K_{ij}}\frac{w_{ijk}}{(2\pi)^{\frac{d}{2}}(\det\Sigma_{ijk}^{SI})^{\frac{1}{2}}}\exp\big\{-\frac{1}{2}(O_{t}^{ij}-\mathbf{T}\mu_{ijk}^{SI})^T(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ij}-\mathbf{T}\mu_{ijk}^{SI})\big\} \label{mllr_opt_gmm}
+\end{align}</script><p>直接优化上面的目标函数会很困难，主要的原因是上式先求和再求对数，不能利用对数和指数互为逆运算的性质将整个目标函数转换为简单求和的形式。为了简化计算，类似 MAP 方法，将 $O_t^{ij}$ 分配到条件概率 $P(O^{ij}_t|\mu_{ijk}^{SI},\Sigma^{SI}_{ijk})$ 最大的正态分布成分，得到帧集合 $\{O_{t}^{ijk}\}_{t=1}^{T_{ijk}}$。于是 ($\ref{mllr_opt_gmm}$) 被如下近似</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&\approx \sum_{i,j,k}\sum_{t=1}^{T_{ijk}}\log\Big\{\frac{1}{(2\pi)^{\frac{d}{2}}(\det\Sigma_{ijk}^{SI})^{\frac{1}{2}}}\exp\big(-\frac{1}{2}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})^T(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})\big) \Big\} \\
+&= \sum_{i,j,k}\sum_{t=1}^{T_{ijk}}\big\{-\frac{1}{2}\log\big((2\pi)^{d}\det \Sigma_{ijk}^{SI}\big) -\frac{1}{2}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})^T(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})\big \} \\
+&=\sum_{i,j,k}\sum_{t=1}^{T_{ijk}}\{-\frac{1}{2}\log\big((2\pi)^{d}\det \Sigma_{ijk}^{SI}\big) -\frac{1}{2}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})^T(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})\big \}
+\end{align}</script><p>极大化上面的目标函数，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\hat{\mathbf{T}}&=\arg\max_{\mathbf{T}}\sum_{m=1}^{M}\log p(O^m|W^m,\mathbf{T})\\
+&= \arg\max_{\mathbf{T}} \sum_{i,j,k}\sum_{t=1}^{T_{ijk}}-\frac{1}{2}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI})^T(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ijk}-\mathbf{T}\mu_{ijk}^{SI}) \label{mllr_opt_gauss}
+\end{align}</script><p>($\ref{mllr_opt_gauss}$) 等价于线性回归问题下的加权最小二乘估计 (Weighted Least Square Estimator)，上面的目标函数关于 $\mathbf{T}$ 求导可得，</p>
+<script type="math/tex; mode=display">
+\sum_{ij} \sum_{t=1}^{T_{ijk}}\mu_{ijk}^{SI}\otimes I_{d\times d}(\Sigma_{ijk}^{SI})^{-1}(\mathbf{T}\mu_{ijk}^{SI}-O_{t}^{ijk}) = 0</script><p>其中 $\otimes $ 表示 Kronecker 乘积，进一步整理可得如下的方程，</p>
+<script type="math/tex; mode=display">
+\sum_{ij}\sum_{t=1}^{T_{ijk}}diag(\mu_{ijk}^{SI})(\Sigma_{ijk}^{SI})^{-1}\mathbf{T}(\mu_{ijk}^{SI},\dots,\mu_{ijk}^{SI})= \sum_{ij}\sum_{t=1}^{T_{ijk}}diag(\mu_{ijk}^{SI})(\Sigma_{ijk}^{SI})^{-1}(O_{t}^{ijk},\dots,O_{t}^{ijk})</script><p>求解上面的方程组可以得到 MLLR 自适应方阵 $\hat{\mathbf{T}}$， 基于自适应方阵可以调整对应的 GMM 均值向量，使得模型更贴合说话人特征。</p>
+<h3 id="3-2-特征变换"><a href="#3-2-特征变换" class="headerlink" title="3.2 特征变换"></a>3.2 特征变换</h3><p>除了前面介绍的基于模型的自适应之外，还可以通过对特征进行正则化使得调整之后的特征更好地拟合模型。</p>
+<h4 id="3-2-1-fMLLR"><a href="#3-2-1-fMLLR" class="headerlink" title="3.2.1 fMLLR"></a>3.2.1 fMLLR</h4><p>fMLLR (feature-based maximum likelihood linear regression) 对特定说话人的声音特征 $O^{ijk}_t$ 进行如下变换,</p>
+<script type="math/tex; mode=display">
+(O^{ijk}_{t})^{’} = \mathbf{T}O^{ijk}_{t}</script><p>假设原始特征 $O_{t}^{ijk}$ 服从正态分布 $N(\mu_{ijk}^{SI}, \Sigma_{ijk}^{SI})$，则正则化之后的特征 $(O_{t}^{ijk})^{’}$ 服从正态分布 $N(\mathbf{T}\mu^{SI}_{ijk}, \mathbf{T}\Sigma_{ijk}^{SI}\mathbf{T}^{T})$ 。如果 MLLR 中的均值向量和协方差矩阵采用如下类型的线性变换，则 MLLR 等价于 fMLLR。这也是对特征做线性变换叫做 fMLLR 的主要原因。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\mu_{ijk} &= \mathbf{T}\mu_{ijk}^{SI} \\
+\Sigma_{ijk} &= \mathbf{T} \Sigma_{ijk}^{SI}\mathbf{T}^{T}
+\end{align}</script><h4 id="3-2-2-说话人自适应训练"><a href="#3-2-2-说话人自适应训练" class="headerlink" title="3.2.2 说话人自适应训练"></a>3.2.2 说话人自适应训练</h4><p>前面介绍的自适应和正则化方法都是在说话人无关模型训练好之后，在识别阶段通过变换模型参数或者特征使得调整后的模型和说话人声学特征更好的匹配。但需要注意的是，在训练说话人无关模型的声学特征中仍然包含说话人相关的信息，即来自不同说话人的声学特征在统计意义上仍然不是统一地服从某个分布 （在 GMM-HMM 模型中使用 GMM ）。为了减少说话人无关模型训练过程中由不同说话人的声学特征差异所带来的影响，说话人自适应训练 (SAT: Speaker Adaptive Training) 在训练模型过程中基于 fMLLR 将不同说话人的声学特征进行变换，使得变换后的特征能够统一的被某个分布进行刻画 (在 GMM-HMM 中使用 GMM)。基于变换之后的特征建立说话人无关的通用模型。</p>
+<p>具体的说话人自适应训练的过程如下图所示，</p>
+<p><p align = "center"><br>    <img height="450px", src = "./images/sat_flowchart.jpg"><br>    图 3-1 说话人自适应训练流程图。</p>
+<ol>
+<li>初始状态下，利用所有训练数据 (不区分说话人) 进行说话人无关的训练得到初始模型。</li>
+<li>类似 MAP ，分别对每个说话人数据，利用当前模型进行 Viterbi 对齐之后，收集并排序该说话人语音信号中所有对齐到正态分布成分的帧，记为 $\{O_{t}^{ijk}\}_{t=1}^{T_{ijk}}$。</li>
+<li>对每个说话人，利用收集到的帧集合进行 fMLLR 训练，得到每个说话人的特征变换矩阵 $\mathbf{T}_i$。并将对应说话人训练数据中的声学特征进行线性变换。</li>
+<li>把所有说话人线性变换之后的数据收集起来，基于变换后的数据并利用当前模型进行初始化来训练说话人自适应的模型。</li>
+<li>将 4. 中的模型替换到 2. 中的模型，依次迭代，直到迭代步数达到阈值或者收敛。</li>
+</ol>
+<p>在识别过程中，我们需要如下的步骤利用说话人无关模型和说话人自适应模型来提高对于特定说话人的识别准确率。</p>
+<ul>
+<li>使用说话人无关模型进行识别，利用 Viterbi 对齐将识别结果与声学特征进行对齐，得到各正态成分的帧集合 $\{O_{t}^{ijk}\}_{t=1}^{T_{ijk}}$。</li>
+<li>使用对齐后的数据估计该说话人的 fMLLR 变换矩阵，并在原始声学特征上应用变换矩阵得到 “剥离” 了说话人特性之后的特征。</li>
+<li>对变换后的特征，基于说话人自适应训练 (SAT) 后的模型进行识别。</li>
+</ul>
+<h2 id="4-DNN-HMM-的说话人自适应"><a href="#4-DNN-HMM-的说话人自适应" class="headerlink" title="4. DNN-HMM 的说话人自适应"></a>4. DNN-HMM 的说话人自适应</h2><h3 id="4-1-基于模型的自适应"><a href="#4-1-基于模型的自适应" class="headerlink" title="4.1 基于模型的自适应"></a>4.1 基于模型的自适应</h3><h3 id="4-2-基于特征的自适应"><a href="#4-2-基于特征的自适应" class="headerlink" title="4.2 基于特征的自适应"></a>4.2 基于特征的自适应</h3><h2 id="5-Kaldi-实现"><a href="#5-Kaldi-实现" class="headerlink" title="5. Kaldi 实现"></a>5. Kaldi 实现</h2><p>前面介绍了说话人自适应的理论部分，本小节来介绍 Kaldi 中的说话人自适应实现。Kaldi 中的说话人自适应主要包含 LDA + MLLT 是针对全局做的特征变换，而 SAT 是针对特定说话人的特征变换。</p>
+<h3 id="5-1-LDA-MLLT"><a href="#5-1-LDA-MLLT" class="headerlink" title="5.1 LDA + MLLT"></a>5.1 LDA + MLLT</h3><p>MLLT 也被称为 STC (半绑定协方差）和 LDA 类似都是基于全局的特征变换，在 Kaldi Librispeech 示例脚本 steps/train_lda_mllt.sh  中实现了 LDA + MLLT 这类全局特征变换。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">steps/train_lda_mllt.sh --cmd <span class="string">&quot;<span class="variable">$train_cmd</span>&quot;</span> \</span><br><span class="line">                        --splice-opts <span class="string">&quot;--left-context=3 --right-context=3&quot;</span> 2500 15000 \</span><br><span class="line">                          data/train_10k data/lang_nosp exp/tri1_ali_10k exp/tri2b</span><br></pre></td></tr></table></figure>
+<ul>
+<li>根据对齐收集 LDA 统计量</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ali-to-post <span class="string">&quot;ark:gunzip -c <span class="variable">$alidir</span>/ali.JOB.gz|&quot;</span> ark:- \| \</span><br><span class="line">      weight-silence-post 0.0 <span class="variable">$silphonelist</span> <span class="variable">$alidir</span>/final.mdl ark:- ark:- \| \</span><br><span class="line">      acc-lda --rand-prune=<span class="variable">$randprune</span> <span class="variable">$alidir</span>/final.mdl <span class="string">&quot;<span class="variable">$splicedfeats</span>&quot;</span> ark,s,cs:- \</span><br><span class="line">      <span class="variable">$dir</span>/lda.JOB.acc || <span class="built_in">exit</span> 1;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>估计 LDA 投影矩阵</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">est-lda --write-full-matrix=<span class="variable">$dir</span>/full.mat --dim=<span class="variable">$dim</span> <span class="variable">$dir</span>/0.mat <span class="variable">$dir</span>/lda.*.acc \</span><br><span class="line">      2&gt;<span class="variable">$dir</span>/<span class="built_in">log</span>/lda_est.log || <span class="built_in">exit</span> 1;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>基于 LDA 进行特征变换</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">feats=<span class="string">&quot;<span class="variable">$splicedfeats</span> transform-feats <span class="variable">$dir</span>/<span class="variable">$x</span>.mat ark:- ark:- |&quot;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>迭代更新 GMM 的参数</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> [ <span class="variable">$x</span> -lt <span class="variable">$num_iters</span> ]; <span class="keyword">do</span></span><br><span class="line">    gmm-align-compiled <span class="variable">$scale_opts</span> --beam=<span class="variable">$beam</span> --retry-beam=<span class="variable">$retry_beam</span> --careful=<span class="variable">$careful</span> <span class="string">&quot;<span class="variable">$mdl</span>&quot;</span> \</span><br><span class="line">      <span class="string">&quot;ark:gunzip -c <span class="variable">$dir</span>/fsts.JOB.gz|&quot;</span> <span class="string">&quot;<span class="variable">$feats</span>&quot;</span> \</span><br><span class="line">      <span class="string">&quot;ark:|gzip -c &gt;<span class="variable">$dir</span>/ali.JOB.gz&quot;</span> || <span class="built_in">exit</span> 1;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$0</span>: Estimating MLLT&quot;</span></span><br><span class="line">    <span class="variable">$cmd</span> JOB=1:<span class="variable">$nj</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/macc.<span class="variable">$x</span>.JOB.log \</span><br><span class="line">    ali-to-post <span class="string">&quot;ark:gunzip -c <span class="variable">$dir</span>/ali.JOB.gz|&quot;</span> ark:- \| \</span><br><span class="line">        weight-silence-post 0.0 <span class="variable">$silphonelist</span> <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl ark:- ark:- \| \</span><br><span class="line">        gmm-acc-mllt --rand-prune=<span class="variable">$randprune</span>  <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="string">&quot;<span class="variable">$feats</span>&quot;</span> ark:- <span class="variable">$dir</span>/<span class="variable">$x</span>.JOB.macc \</span><br><span class="line">        || <span class="built_in">exit</span> 1;</span><br><span class="line">    <span class="comment"># 估计 MLLT 矩阵</span></span><br><span class="line">    est-mllt <span class="variable">$dir</span>/<span class="variable">$x</span>.mat.new <span class="variable">$dir</span>/<span class="variable">$x</span>.*.macc 2&gt; <span class="variable">$dir</span>/<span class="built_in">log</span>/mupdate.<span class="variable">$x</span>.<span class="built_in">log</span> || <span class="built_in">exit</span> 1;</span><br><span class="line">    gmm-transform-means  <span class="variable">$dir</span>/<span class="variable">$x</span>.mat.new <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl \</span><br><span class="line">        2&gt; <span class="variable">$dir</span>/<span class="built_in">log</span>/transform_means.<span class="variable">$x</span>.<span class="built_in">log</span> || <span class="built_in">exit</span> 1;</span><br><span class="line">    <span class="comment"># 合并 LDA 和 MLLT 矩阵</span></span><br><span class="line">    compose-transforms --print-args=<span class="literal">false</span> <span class="variable">$dir</span>/<span class="variable">$x</span>.mat.new <span class="variable">$dir</span>/<span class="variable">$cur_lda_iter</span>.mat <span class="variable">$dir</span>/<span class="variable">$x</span>.mat || <span class="built_in">exit</span> 1;</span><br><span class="line">    rm <span class="variable">$dir</span>/<span class="variable">$x</span>.*.macc</span><br><span class="line">    <span class="comment"># 重新定义特征变换</span></span><br><span class="line">    feats=<span class="string">&quot;<span class="variable">$splicedfeats</span> transform-feats <span class="variable">$dir</span>/<span class="variable">$x</span>.mat ark:- ark:- |&quot;</span></span><br><span class="line">    cur_lda_iter=<span class="variable">$x</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 重新估计 GMM 的参数</span></span><br><span class="line">    <span class="keyword">if</span> [ <span class="variable">$stage</span> -le <span class="variable">$x</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="variable">$cmd</span> JOB=1:<span class="variable">$nj</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/acc.<span class="variable">$x</span>.JOB.log \</span><br><span class="line">      gmm-acc-stats-ali  <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="string">&quot;<span class="variable">$feats</span>&quot;</span> \</span><br><span class="line">      <span class="string">&quot;ark,s,cs:gunzip -c <span class="variable">$dir</span>/ali.JOB.gz|&quot;</span> <span class="variable">$dir</span>/<span class="variable">$x</span>.JOB.acc || <span class="built_in">exit</span> 1;</span><br><span class="line">    <span class="variable">$cmd</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/update.<span class="variable">$x</span>.<span class="built_in">log</span> \</span><br><span class="line">      gmm-est --write-occs=<span class="variable">$dir</span>/$[<span class="variable">$x</span>+1].occs --mix-up=<span class="variable">$numgauss</span> --power=<span class="variable">$power</span> \</span><br><span class="line">        <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="string">&quot;gmm-sum-accs - <span class="variable">$dir</span>/<span class="variable">$x</span>.*.acc |&quot;</span> <span class="variable">$dir</span>/$[<span class="variable">$x</span>+1].mdl || <span class="built_in">exit</span> 1;</span><br><span class="line">    rm <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="variable">$dir</span>/<span class="variable">$x</span>.*.acc <span class="variable">$dir</span>/<span class="variable">$x</span>.occs</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    [ <span class="variable">$x</span> -le <span class="variable">$max_iter_inc</span> ] &amp;&amp; numgauss=$[<span class="variable">$numgauss</span>+<span class="variable">$incgauss</span>];</span><br><span class="line">    x=$[<span class="variable">$x</span>+1];</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<h3 id="5-2-SAT"><a href="#5-2-SAT" class="headerlink" title="5.2 SAT"></a>5.2 SAT</h3><p>前面已经说明 SAT 是一种基于 fMLLR 的说话人自适应，主要通过对特定说话人的特征进行变换。 在 Kaldi Librispeech 脚本 steps/train_sat.sh 中实现了 SAT (fMLLR)。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Train tri3b, which is LDA+MLLT+SAT on 10k utts</span></span><br><span class="line">steps/train_sat.sh --cmd <span class="string">&quot;<span class="variable">$train_cmd</span>&quot;</span> 2500 15000 \</span><br><span class="line">                   data/train_10k data/lang_nosp exp/tri2b_ali_10k exp/tri3b</span><br></pre></td></tr></table></figure>
+<ul>
+<li>估计初始 fMLLR 矩阵</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ali-to-post <span class="string">&quot;ark:gunzip -c <span class="variable">$alidir</span>/ali.JOB.gz|&quot;</span> ark:- \| \</span><br><span class="line">      weight-silence-post <span class="variable">$silence_weight</span> <span class="variable">$silphonelist</span> <span class="variable">$alidir</span>/final.mdl ark:- ark:- \| \</span><br><span class="line">      gmm-est-fmllr --fmllr-update-type=<span class="variable">$fmllr_update_type</span> \</span><br><span class="line">      --spk2utt=ark:<span class="variable">$sdata</span>/JOB/spk2utt <span class="variable">$alidir</span>/final.mdl <span class="string">&quot;<span class="variable">$sifeats</span>&quot;</span> \</span><br><span class="line">      ark:- ark:<span class="variable">$dir</span>/trans.JOB || <span class="built_in">exit</span> 1;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>基于 fMLLR 变换之后的特征管道</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">feats=&quot;$sifeats transform-feats --utt2spk=ark:$sdata/JOB/utt2spk ark,s,cs:$dir/trans.JOB ark:- ark:- |&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>迭代更新 GMM 的参数</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> [ <span class="variable">$x</span> -lt <span class="variable">$num_iters</span> ]; <span class="keyword">do</span></span><br><span class="line">   <span class="built_in">echo</span> Pass <span class="variable">$x</span></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">echo</span> <span class="variable">$realign_iters</span> | grep -w <span class="variable">$x</span> &gt;/dev/null &amp;&amp; [ <span class="variable">$stage</span> -le <span class="variable">$x</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> Aligning data</span><br><span class="line">    mdl=<span class="string">&quot;gmm-boost-silence --boost=<span class="variable">$boost_silence</span> `cat <span class="variable">$lang</span>/phones/optional_silence.csl` <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl - |&quot;</span></span><br><span class="line">    <span class="variable">$cmd</span> JOB=1:<span class="variable">$nj</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/align.<span class="variable">$x</span>.JOB.log \</span><br><span class="line">      gmm-align-compiled <span class="variable">$scale_opts</span> --beam=<span class="variable">$beam</span> --retry-beam=<span class="variable">$retry_beam</span> --careful=<span class="variable">$careful</span> <span class="string">&quot;<span class="variable">$mdl</span>&quot;</span> \</span><br><span class="line">      <span class="string">&quot;ark:gunzip -c <span class="variable">$dir</span>/fsts.JOB.gz|&quot;</span> <span class="string">&quot;<span class="variable">$feats</span>&quot;</span> \</span><br><span class="line">      <span class="string">&quot;ark:|gzip -c &gt;<span class="variable">$dir</span>/ali.JOB.gz&quot;</span> || <span class="built_in">exit</span> 1;</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">echo</span> <span class="variable">$fmllr_iters</span> | grep -w <span class="variable">$x</span> &gt;/dev/null; <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">if</span> [ <span class="variable">$stage</span> -le <span class="variable">$x</span> ]; <span class="keyword">then</span></span><br><span class="line">      <span class="built_in">echo</span> Estimating fMLLR transforms</span><br><span class="line">      <span class="comment"># We estimate a transform that&#x27;s additional to the previous transform;</span></span><br><span class="line">      <span class="comment"># we&#x27;ll compose them.</span></span><br><span class="line">      <span class="variable">$cmd</span> JOB=1:<span class="variable">$nj</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/fmllr.<span class="variable">$x</span>.JOB.log \</span><br><span class="line">        ali-to-post <span class="string">&quot;ark:gunzip -c <span class="variable">$dir</span>/ali.JOB.gz|&quot;</span> ark:-  \| \</span><br><span class="line">        weight-silence-post <span class="variable">$silence_weight</span> <span class="variable">$silphonelist</span> <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl ark:- ark:- \| \</span><br><span class="line">        gmm-est-fmllr --fmllr-update-type=<span class="variable">$fmllr_update_type</span> \</span><br><span class="line">        --spk2utt=ark:<span class="variable">$sdata</span>/JOB/spk2utt <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl \</span><br><span class="line">        <span class="string">&quot;<span class="variable">$feats</span>&quot;</span> ark:- ark:<span class="variable">$dir</span>/tmp_trans.JOB || <span class="built_in">exit</span> 1;</span><br><span class="line">      <span class="keyword">for</span> n <span class="keyword">in</span> `seq <span class="variable">$nj</span>`; <span class="keyword">do</span></span><br><span class="line">        ! ( compose-transforms --b-is-affine=<span class="literal">true</span> \</span><br><span class="line">          ark:<span class="variable">$dir</span>/tmp_trans.<span class="variable">$n</span> ark:<span class="variable">$cur_trans_dir</span>/trans.<span class="variable">$n</span> ark:<span class="variable">$dir</span>/composed_trans.<span class="variable">$n</span> \</span><br><span class="line">          &amp;&amp; mv <span class="variable">$dir</span>/composed_trans.<span class="variable">$n</span> <span class="variable">$dir</span>/trans.<span class="variable">$n</span> &amp;&amp; \</span><br><span class="line">          rm <span class="variable">$dir</span>/tmp_trans.<span class="variable">$n</span> ) 2&gt;<span class="variable">$dir</span>/<span class="built_in">log</span>/compose_transforms.<span class="variable">$x</span>.<span class="built_in">log</span> \</span><br><span class="line">          &amp;&amp; <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$0</span>: Error composing transforms&quot;</span> &amp;&amp; <span class="built_in">exit</span> 1;</span><br><span class="line">      <span class="keyword">done</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    feats=<span class="string">&quot;<span class="variable">$sifeats</span> transform-feats --utt2spk=ark:<span class="variable">$sdata</span>/JOB/utt2spk ark:<span class="variable">$dir</span>/trans.JOB ark:- ark:- |&quot;</span></span><br><span class="line">    cur_trans_dir=<span class="variable">$dir</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> [ <span class="variable">$stage</span> -le <span class="variable">$x</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="variable">$cmd</span> JOB=1:<span class="variable">$nj</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/acc.<span class="variable">$x</span>.JOB.log \</span><br><span class="line">      gmm-acc-stats-ali <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="string">&quot;<span class="variable">$feats</span>&quot;</span> \</span><br><span class="line">      <span class="string">&quot;ark,s,cs:gunzip -c <span class="variable">$dir</span>/ali.JOB.gz|&quot;</span> <span class="variable">$dir</span>/<span class="variable">$x</span>.JOB.acc || <span class="built_in">exit</span> 1;</span><br><span class="line">    [ `ls <span class="variable">$dir</span>/<span class="variable">$x</span>.*.acc | wc -w` -ne <span class="string">&quot;<span class="variable">$nj</span>&quot;</span> ] &amp;&amp; <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$0</span>: Wrong #accs&quot;</span> &amp;&amp; <span class="built_in">exit</span> 1;</span><br><span class="line">    <span class="variable">$cmd</span> <span class="variable">$dir</span>/<span class="built_in">log</span>/update.<span class="variable">$x</span>.<span class="built_in">log</span> \</span><br><span class="line">      gmm-est --power=<span class="variable">$power</span> --write-occs=<span class="variable">$dir</span>/$[<span class="variable">$x</span>+1].occs --mix-up=<span class="variable">$numgauss</span> <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl \</span><br><span class="line">      <span class="string">&quot;gmm-sum-accs - <span class="variable">$dir</span>/<span class="variable">$x</span>.*.acc |&quot;</span> <span class="variable">$dir</span>/$[<span class="variable">$x</span>+1].mdl || <span class="built_in">exit</span> 1;</span><br><span class="line">    rm <span class="variable">$dir</span>/<span class="variable">$x</span>.mdl <span class="variable">$dir</span>/<span class="variable">$x</span>.*.acc</span><br><span class="line">    rm <span class="variable">$dir</span>/<span class="variable">$x</span>.occs</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">  [ <span class="variable">$x</span> -le <span class="variable">$max_iter_inc</span> ] &amp;&amp; numgauss=$[<span class="variable">$numgauss</span>+<span class="variable">$incgauss</span>];</span><br><span class="line">  x=$[<span class="variable">$x</span>+1];</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          Donate
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2022/02/12/paper-0.0.3/chapters/kaldi_sat/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag">语音识别</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2022/02/23/paper-0.0.3/chapters/kaldi_sat/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            (no title)
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2021/12/31/paper-0.0.3/chapters/discriminative%20training_simple/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title"></div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2022
+        <i class="ri-heart-fill heart_icon"></i> Daijun Chen
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="暄妍"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%97%85%E8%A1%8C/">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" target="_blank" rel="noopener" href="http://shenyu-vip.lofter.com">摄影</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/2019/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "ayer" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>

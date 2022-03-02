@@ -309,8 +309,9 @@ B^m(S_t=r)&=\frac{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)
 B^m&=\frac{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}A(W,W^m)}{\sum_{W}\mathbb{P}(O^m|S,\theta)\mathbb{P}(W)^{\alpha}}
 
 \end{align}</script><p>证明的细节参考附录 <a href="#mbr_grad_der">7.3</a></p>
-<h3 id="3-5-训练准则的比较"><a href="#3-5-训练准则的比较" class="headerlink" title="3.5. 训练准则的比较"></a>3.5. 训练准则的比较</h3><p>介绍了前面的序列判别式训练的准则，到底实践当中应该选择什么样的准则呢？ 在文献 [] 中分别使用了不同的训练准则来训练模型，结果显示使用不同的序列区分性训练准则进行训练得到的模型在测试集上结果并没有很大的差异。从 SWB Hub5‘00 和 Hub5’01 两个测试集上的 WER 来看，DNN + sMBR 的结果相对来说更好一些。但是由于 MMI 和 scaled MMI 更容易被理解和实现，所以实际中使用较多，例如 chain 模型就主要使用 MMI 准则进行优化。</p>
-<h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-本章小结"><a href="#5-本章小结" class="headerlink" title="5. 本章小结"></a>5. 本章小结</h2><h2 id="6-参考资料"><a href="#6-参考资料" class="headerlink" title="6. 参考资料"></a>6. 参考资料</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="3-5-训练准则的比较"><a href="#3-5-训练准则的比较" class="headerlink" title="3.5. 训练准则的比较"></a>3.5. 训练准则的比较</h3><p>介绍了前面的序列判别式训练的准则，到底实践当  中应该选择什么样的准则呢？ 在文献 [] 中分别使用了不同的训练准则来训练模型，结果显示使用不同的序列区分性训练准则进行训练得到的模型在测试集上结果并没有很大的差异。从 SWB Hub5‘00 和 Hub5’01 两个测试集上的 WER 来看，DNN + sMBR 的结果相对来说更好一些。但是由于 MMI 和 scaled MMI 更容易被理解和实现，所以实际中使用较多，例如 chain 模型就主要使用 MMI 准则进行优化。</p>
+<h2 id="4-Kaldi-实现"><a href="#4-Kaldi-实现" class="headerlink" title="4. Kaldi 实现"></a>4. Kaldi 实现</h2><h2 id="5-本章小结"><a href="#5-本章小结" class="headerlink" title="5. 本章小结"></a>5. 本章小结</h2><p>本章</p>
+<h2 id="6-参考资料"><a href="#6-参考资料" class="headerlink" title="6. 参考资料"></a>6. 参考资料</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
 <h2 id="7-附录"><a href="#7-附录" class="headerlink" title="7. 附录"></a>7. 附录</h2><h3 id="7-1"><a href="#7-1" class="headerlink" title="7.1"></a>7.1</h3><h3 id="7-2"><a href="#7-2" class="headerlink" title="7.2 "></a>7.2 <a name="mmi_grad_der"></h3><script type="math/tex; mode=display">
 \begin{align}
 e^L_{mt}(i)&=\frac{\part J_{MMI}(W^m,O^m|\theta)}{\part z_{mt}^L(i)} \\
@@ -487,7 +488,7 @@ e_{mt}^{L}(i)&=\sum_{r}\frac{\part J_{MBR}(W^m,O^m|\theta)}{\part\log\mathbb{P}(
    
   <nav class="article-nav">
     
-      <a href="/2021/11/23/paper-0.0.3/chapters/kaldi%20tutorial/" class="article-nav-link">
+      <a href="/2021/11/23/paper-0.0.3/chapters/kaldi_introduction/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
@@ -558,7 +559,7 @@ e_{mt}^{L}(i)&=\sum_{r}\frac{\part J_{MBR}(W^m,O^m|\theta)}{\part\log\mathbb{P}(
     <ul>
       <li>
         Copyrights &copy;
-        2015-2021
+        2015-2022
         <i class="ri-heart-fill heart_icon"></i> Daijun Chen
       </li>
     </ul>
